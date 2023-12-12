@@ -21,6 +21,7 @@ class Course(models.Model):
 
     class Meta:
         db_table = "courses"
+        verbose_name = "운동 코스"
 
     def __str__(self):
         return self.title
@@ -31,6 +32,7 @@ class Tag(models.Model):
 
     class Meta:
         db_table = "tags"
+        verbose_name = "태그"
 
     def __str__(self):
         return self.name
