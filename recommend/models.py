@@ -50,3 +50,16 @@ class RecommendComment(models.Model):
     class Meta:
         verbose_name = '댓글'
         verbose_name_plural = 'Recommend 댓글'
+
+
+class RecommendLike(models.Model):
+    recommend_id = models.ForeignKey(
+        Recommend, on_delete=models.CASCADE, related_name='comments'
+        )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes')
+    like = models.PositiveIntegerField(default=0)
+
+
+    class Meta:
+        verbose_name = 'Like'
+        verbose_name_plural = 'Recommend Likes'
