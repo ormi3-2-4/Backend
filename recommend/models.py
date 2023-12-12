@@ -27,3 +27,26 @@ class Recommend(models.Model):
     class Meta:
         verbose_name = '게시글'
         verbose_name_plural = 'Recommend 게시판'
+
+
+class RecommendComment(models.Model):
+    recommend_id = models.ForeignKey(
+        Recommend, on_delete=models.CASCADE, related_name='comments'
+        )
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE
+    )
+    content = models.TextField()
+    parent_comment = models.ForeignKey(
+        'self', on_delete=models.CASCADE, null=True
+        )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f'{self.content}: {self.user}: {self.created_at}'
+
+
+    class Meta:
+        verbose_name = '댓글'
+        verbose_name_plural = 'Recommend 댓글'
