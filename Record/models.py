@@ -1,8 +1,8 @@
 from django.db import models
-
+from django.contrib.auth.models import get_user_model
 
 class Record(models.Model):
-  user_id = models.CharField(max_length=50)
+  user_id = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
   created_at = models.DateTimeField(auto_now_add=True)
   last_update = models.DateTimeField(auto_now=True)
   finished_at = models.DateTimeField(blank=True, null=True)
