@@ -24,10 +24,10 @@ class Community(models.Model):
 
     class Meta:
         verbose_name = '게시글'
-        verbose_name_plural = '커뮤니티'
+        verbose_name_plural = 'Community'
 
 
-class Comment(models.Model):
+class CommunityComment(models.Model):
     commu_id = models.ForeignKey(
         Community, on_delete=models.CASCADE, related_name='comments'
         )
@@ -47,10 +47,10 @@ class Comment(models.Model):
 
     class Meta:
         verbose_name = '댓글'
-        verbose_name_plural = '커뮤니티 댓글'
+        verbose_name_plural = 'Community 댓글'
 
 
-class Like(models.Model):
+class CommunityLike(models.Model):
     commu_id = models.ForeignKey(Community, on_delete=models.CASCADE, related_name='likes')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes')
     like = models.PositiveIntegerField(default=0)
@@ -58,4 +58,4 @@ class Like(models.Model):
 
     class Meta:
         verbose_name = 'Like'
-        verbose_name_plural = '커뮤니티 Likes'
+        verbose_name_plural = 'Community Likes'
