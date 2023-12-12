@@ -63,3 +63,14 @@ class RecommendLike(models.Model):
     class Meta:
         verbose_name = 'Like'
         verbose_name_plural = 'Recommend Likes'
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=25, unique=True)
+
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = '카테고리'
+        verbose_name_plural = 'Recommend 카테고리'
