@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -24,15 +24,21 @@ class CustomUserManager(BaseUserManager):
             password=password,
         )
         user.is_staff = True
+        user.is_superuser = True
         user.save(using=self._db)
         return user
 
 
-class User(AbstractUser):
+class User(AbstractBaseUser):
     email = models.EmailField(unique=True, help_text="이메일")
     nickname = models.CharField(max_length=20, help_text="닉네임")
     profile_image = models.ImageField(blank=True, upload_to="user/images", null=True)
     password = models.CharField(_("password"), max_length=128)
+    joined_at = models.DateTimeField(auto_now_add=True)
+    is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    last_login = models.DateTimeField(auto_now=True)
 
     objects = CustomUserManager()
 
@@ -42,3 +48,14 @@ class User(AbstractUser):
 
     class Meta:
         db_table = "user"
+        verbose_name = "유저"
+        verbose_name_plural = "유저"
+
+    def __str__(self):
+        return self.nickname
+
+    def has_perm(self, perm, obj=None):
+        return True
+
+    def has_module_perms(self, app_label):
+        return True
