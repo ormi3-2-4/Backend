@@ -32,6 +32,7 @@ class Recommend(models.Model):
         return f"{self.title}: {self.user}: {self.created_at}"
 
     class Meta:
+        db_table = "recommend"
         verbose_name = "게시글"
         verbose_name_plural = "Recommend 게시판"
 
@@ -55,5 +56,6 @@ class RecommendComment(models.Model):
         return f"{self.content}: {self.user}: {self.created_at}"
 
     class Meta:
+        db_table = "recommend_comments"
         verbose_name = "댓글"
         verbose_name_plural = "Recommend 댓글"
