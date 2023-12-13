@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "record",
     "course",
     "community",
+    "recommend",
 ]
 
 MIDDLEWARE = [
