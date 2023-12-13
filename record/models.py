@@ -2,6 +2,9 @@ from django.contrib.auth import get_user_model
 from django.db import models
 
 
+User = get_user_model()
+
+
 class Record(models.Model):
     class Kind(models.TextChoices):
         """
@@ -15,7 +18,7 @@ class Record(models.Model):
         WALK = "WALK", "뛰기"
         BICYCLE = "BICYCLE", "자전거"
 
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     start_at = models.DateTimeField(blank=True, null=True)
     end_at = models.DateTimeField(blank=True, null=True)
     static_map = models.ImageField(upload_to="record/static_map/%Y/%m/%d/", blank=True)

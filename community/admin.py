@@ -1,0 +1,27 @@
+from django.contrib import admin
+
+from .models import Community, CommunityComment
+
+
+# admin.site.register(Community)
+# admin.site.register(CommunityComment)
+# admin.site.register(CommunityLike)
+
+
+@admin.register(Community)
+class CommunityAdmin(admin.ModelAdmin):
+    list_display = ["id", "title", "user", "created_at"]
+    list_filter = ["title", "user"]
+    fields = ["id", "title", "content", "created_at"]
+    readonly_fields = ["id", "user", "view_count", "likes", "created_at", "updated_at"]
+    search_fields = ["title", "content"]
+    ordering = ["-created_at"]
+
+
+@admin.register(CommunityComment)
+class CommunityCommentAdmin(admin.ModelAdmin):
+    list_display = ["id", "content", "user", "created_at"]
+    list_filter = ["user"]
+    fields = ["id", "content", "user", "parent_comment", "created_at"]
+    readonly_fields = ["parent_comment", "id", "user", "created_at", "updated_at"]
+    search_fields = ["user", "content"]
