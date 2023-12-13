@@ -1,4 +1,6 @@
 from django.contrib.auth.models import AnonymousUser
+from django.db.models import Q
+from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema_view, extend_schema
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -79,9 +81,16 @@ class CourseViewSet(ModelViewSet):
 
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request: HttpRequest, *args, **kwargs):
         """Course 리스트 조회"""
-        serializer = CourseListSerializer(self.get_queryset(), many=True)
+
+        query = self.request.GET.get("search")
+        if not query:
+            serializer = CourseListSerializer(self.get_queryset(), many=True)
+        else:
+            q = Q(title__contains=query) | Q(content__contains=query)
+            serializer = CourseListSerializer(self.get_queryset().filter(q), many=True)
+
         return success_response(serializer.data, 200)
 
     def retrieve(self, request, *args, **kwargs):
