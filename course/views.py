@@ -3,6 +3,7 @@ from django.db.models import Q
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema_view, extend_schema
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -91,7 +92,7 @@ class CourseViewSet(ModelViewSet):
             q = Q(title__contains=query) | Q(content__contains=query)
             serializer = CourseListSerializer(self.get_queryset().filter(q), many=True)
 
-        return success_response(serializer.data, 200)
+        return success_response(serializer.data, status.HTTP_200_OK)
 
     def retrieve(self, request, *args, **kwargs):
         """pk값의 코스 조회"""
@@ -100,40 +101,40 @@ class CourseViewSet(ModelViewSet):
         try:
             course = get_object_or_404(Course, pk=pk)
         except Course.DoesNotExist:
-            return error_response("운동코스가 존재하지 않습니다.", 404)
+            return error_response("운동코스가 존재하지 않습니다.", status.HTTP_404_NOT_FOUND)
 
         serializer = CourseDetailSerializer(course)
-        return success_response(serializer.data, 200)
+        return success_response(serializer.data, status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
         pk = kwargs.get("pk")
         user = self.request.user
 
         if user is (None or AnonymousUser):
-            return error_response("작성자만 게시글을 삭제 할수 있습니다.", 403)
+            return error_response("작성자만 게시글을 삭제 할수 있습니다.", status.HTTP_403_FORBIDDEN)
 
         try:
             course = get_object_or_404(Course, pk=pk)
         except Course.DoesNotExist:
-            return error_response("운동코스가 존재하지 않습니다.", 404)
+            return error_response("운동코스가 존재하지 않습니다.", status.HTTP_404_NOT_FOUND)
 
         serializer = CourseDetailSerializer(course, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return success_response(serializer.data, 200)
+            return success_response(serializer.data, status.HTTP_200_OK)
 
-        return error_response(serializer.errors, 400)
+        return error_response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
         pk = kwargs.get("pk")
         user = self.request.user
 
         if user is (None or AnonymousUser):
-            return error_response("작성자만 게시글을 삭제 할수 있습니다.", 403)
+            return error_response("작성자만 게시글을 삭제 할수 있습니다.", status.HTTP_403_FORBIDDEN)
 
         try:
             course = get_object_or_404(Course, pk=pk)
         except Course.DoesNotExist:
-            return error_response("운동코스가 존재하지 않습니다.", 404)
+            return error_response("운동코스가 존재하지 않습니다.", status.HTTP_404_NOT_FOUND)
         course.delete()
-        return Response(status=200)
+        return Response(status=status.HTTP_200_OK)

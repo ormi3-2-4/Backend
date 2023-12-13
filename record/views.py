@@ -1,8 +1,13 @@
-from rest_framework.viewsets import ModelViewSet
-from record.serializers import RecordSerializer, RecordCoordinatesSerializer
-from record.models import Record
-from drf_spectacular.utils import extend_schema, extend_schema_view
+from django.contrib.auth.models import AnonymousUser
+from django.http import Http404, HttpRequest
+from rest_framework import permissions, status
 from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
+from rest_framework.viewsets import ModelViewSet
+from common.utils import error_response, success_response
+from record.serializers import RecordSerializer
+from record.models import Record, RecordImage
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
 
 @extend_schema_view(
@@ -32,26 +37,27 @@ class RecordViewSet(ModelViewSet):
     API endpoint that allows users to be viewed or edited.
     """
 
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Record.objects.all()
     serializer_class = RecordSerializer
 
-    @extend_schema(
-        description="운동 종료 후 운동 기록을 저장합니다.",
-        request=RecordCoordinatesSerializer,
-        responses={200: RecordSerializer},
-    )
-    @action(detail=False, methods=["POST"], url_path="(?P<pk>[0-9]+)/finish")
-    def finish(self, request, pk):
-        pass
+    # @extend_schema(
+    #     description="운동 종료 후 운동 기록을 저장합니다.",
+    #     request=RecordCoordinatesSerializer,
+    #     responses={200: RecordSerializer},
+    # )
+    # @action(detail=False, methods=["POST"], url_path="(?P<pk>[0-9]+)/finish")
+    # def finish(self, request, pk):
+    #     pass
 
-    @extend_schema(
-        description="운동 중인 유저의 칼로리 소모량 계산, 평균 속력 계산, 운동 거리 계산",
-        request=RecordCoordinatesSerializer,
-        responses={200: RecordSerializer},
-    )
-    @action(detail=False, methods=["POST"], url_path="(?P<pk>[0-9]+)/calculate")
-    def calculate(self, request, pk):
-        pass
+    # @extend_schema(
+    #     description="운동 중인 유저의 칼로리 소모량 계산, 평균 속력 계산, 운동 거리 계산",
+    #     request=RecordCoordinatesSerializer,
+    #     responses={200: RecordSerializer},
+    # )
+    # @action(detail=False, methods=["POST"], url_path="(?P<pk>[0-9]+)/calculate")
+    # def calculate(self, request, pk):
+    #     pass
 
     @extend_schema(
         description="인증샷을 추가합니다.",
@@ -65,5 +71,16 @@ class RecordViewSet(ModelViewSet):
         responses={200: RecordSerializer},
     )
     @action(detail=False, methods=["POST"], url_path="(?P<pk>[0-9]+)/image")
-    def image(self, request, pk):
-        pass
+    def image(self, request: HttpRequest, pk: int):
+        if request.user is AnonymousUser or None:
+            return error_response("로그인이 필요합니다.", status.HTTP_401_UNAUTHORIZED)
+
+        try:
+            record: Record = get_object_or_404(Record, pk=pk)
+            image = request.FILES.get("image")
+            RecordImage.objects.create(record=record, image=image)
+            return success_response(
+                RecordSerializer(record).data, status.HTTP_201_CREATED
+            )
+        except Http404:
+            return error_response("존재하지 않는 운동 기록입니다.", status.HTTP_404_NOT_FOUND)
