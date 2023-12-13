@@ -26,7 +26,7 @@ class Record(models.Model):
     )
     coords = models.TextField(help_text="GPS데이터", blank=True, null=True)
     distance = models.FloatField(help_text="운동한 거리", blank=True, null=True)
-    speed = models.FloatField(help_text="평균 속력",default=0)
+    speed = models.FloatField(help_text="평균 속력", default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     kind = models.CharField(
         choices=Kind, max_length=10, default=Kind.RUN, help_text="운동 종류"
