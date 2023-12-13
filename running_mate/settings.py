@@ -24,7 +24,7 @@ SECRET_KEY = "django-insecure-#e06lhjqgl#vygqx_$3$%s&8uv@l=n$^0j^)d*fljo%@hhawa-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "record",
     "course",
+    "community",
 ]
 
 MIDDLEWARE = [
@@ -100,9 +101,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = "ko-kr"
-
-TIME_ZONE = "Asia/Seoul"
 
 USE_I18N = True
 
@@ -118,6 +116,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
