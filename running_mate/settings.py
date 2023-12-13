@@ -109,9 +109,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'ko-kr'
+LANGUAGE_CODE = "ko-kr"
 
-TIME_ZONE = 'Asia/Seoul'
+TIME_ZONE = "Asia/Seoul"
 
 USE_I18N = True
 
@@ -138,7 +138,7 @@ JWT_AUTH_REFRESH_COOKIE = "my-refresh-token"  # Refresh Token Cookie Key 값
 # django-allauth
 SITE_ID = 1  # 해당 도메인 id
 ACCOUNT_UNIQUE_EMAIL = True  # User email unique 사용 여부
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None  # 사용자 이름 필드 지정
+ACCOUNT_USER_MODEL_USERNAME_FIELD = "email"  # 사용자 이름 필드 지정
 ACCOUNT_USERNAME_REQUIRED = False  # User username 필수 여부
 ACCOUNT_EMAIL_REQUIRED = True  # User email 필수 여부
 ACCOUNT_AUTHENTICATION_METHOD = "email"  # 로그인 인증 수단
@@ -151,19 +151,18 @@ SIMPLE_JWT = {
     "USER_ID_FIELD": "pk",
     "USER_ID_CLAIM": "user_id",
 }
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
     ],
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
-AUTH_USER_MODEL = 'user.User'
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+AUTH_USER_MODEL = "user.User"
