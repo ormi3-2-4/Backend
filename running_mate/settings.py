@@ -69,7 +69,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "running_mate.wsgi.application"
+# WSGI_APPLICATION = "running_mate.asgi.application"
+ASGI_APPLICATION = "running_mate.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
