@@ -24,7 +24,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework'
+    'rest_framework',
+    'drf_spectacular',
     "record",
     "course",
 ]
@@ -131,4 +132,18 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(weeks=12),  # RefreshToken 유효 기간 설정
     "USER_ID_FIELD": "pk",
     "USER_ID_CLAIM": "user_id",
+}
+
+# rest-framework
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+# drf-spectacular
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'schema',
+    'DESCRIPTION': '운동 기록을 공유하는 SNS 서비스',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': True,
+    # OTHER SETTINGS
 }
