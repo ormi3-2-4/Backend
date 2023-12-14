@@ -2,6 +2,9 @@ from django.contrib.auth import get_user_model
 from django.db import models
 
 
+User = get_user_model()
+
+
 class Record(models.Model):
     class Kind(models.TextChoices):
         """
@@ -15,13 +18,15 @@ class Record(models.Model):
         WALK = "WALK", "뛰기"
         BICYCLE = "BICYCLE", "자전거"
 
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     start_at = models.DateTimeField(blank=True, null=True)
     end_at = models.DateTimeField(blank=True, null=True)
-    static_map = models.ImageField(upload_to="record/static_map/%Y/%m/%d/", blank=True)
-    coords = models.TextField(help_text="GPS데이터")
-    distance = models.FloatField(help_text="운동한 거리")
-    speed = models.FloatField(help_text="평균 속력")
+    static_map = models.ImageField(
+        upload_to="record/static_map/%Y/%m/%d/", blank=True, null=True
+    )
+    coords = models.TextField(help_text="GPS데이터", blank=True, null=True)
+    distance = models.FloatField(help_text="운동한 거리", blank=True, null=True)
+    speed = models.FloatField(help_text="평균 속력", default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     kind = models.CharField(
         choices=Kind, max_length=10, default=Kind.RUN, help_text="운동 종류"
