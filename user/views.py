@@ -18,8 +18,7 @@ class UserLoginView(APIView):
     http_method_names = ["post"]
 
     def post(self, request: HttpRequest):
-        body = json.loads(request.body)
-        serializer = UserLoginSerializer(data=body)
+        serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
             try:
                 user = get_object_or_404(User, email=serializer.data["email"])
