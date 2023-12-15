@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
 
-from course.models import Course, Tag
+from course.models import Course
 from record.serializers import RecordSerializer
 from user.serializers import UserSerializer
 
@@ -13,16 +13,8 @@ class CoursePagination(PageNumberPagination):
     max_page_size = 20
 
 
-class TagSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Tag
-        fields = ["id", "name"]
-        read_only_fields = ["id"]
-
-
 class CourseListSerializer(serializers.ModelSerializer):
     user = UserSerializer()
-    tags = TagSerializer(many=True)
 
     class Meta:
         model = Course
