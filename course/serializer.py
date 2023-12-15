@@ -48,4 +48,18 @@ class CourseDetailSerializer(serializers.ModelSerializer):
             "likes",
             "tags",
         ]
-        read_only_fields = ["id", "user", "view_count", "created_at", "likes"]
+        read_only_fields = ["id", "user", "record", "view_count", "created_at", "likes"]
+
+
+class CourseCreateSerializer(serializers.ModelSerializer):
+    tags = serializers.CharField()
+
+    class Meta:
+        model = Course
+        fields = [
+            "title",
+            "content",
+            "record",
+            "created_at",
+            "tags",
+        ]

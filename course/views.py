@@ -7,11 +7,13 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+
 from course.models import Course
 from course.serializer import (
     CourseListSerializer,
     CoursePagination,
     CourseDetailSerializer,
+    CourseCreateSerializer,
 )
 
 
@@ -92,17 +94,20 @@ class CourseViewSet(ModelViewSet):
 
         return Response(serializer.data, status.HTTP_200_OK)
 
-    def retrieve(self, request, *args, **kwargs):
-        """pk값의 코스 조회"""
-        pk = kwargs.get("pk")
+    def create(self, request, *args, **kwargs):
+        user = self.request.user
 
-        try:
-            course = get_object_or_404(Course, pk=pk)
-        except Course.DoesNotExist:
-            return Response("운동코스가 존재하지 않습니다.", status.HTTP_404_NOT_FOUND)
+        if user is (None or AnonymousUser):
+            return Response("로그인이 필요합니다.", status.HTTP_403_FORBIDDEN)
 
-        serializer = CourseDetailSerializer(course)
-        return Response(serializer.data, status.HTTP_200_OK)
+        serializer = CourseCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            course = serializer.save(user=user)
+            return Response(
+                CourseDetailSerializer(course).data, status.HTTP_201_CREATED
+            )
+
+        return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, *args, **kwargs):
         pk = kwargs.get("pk")
