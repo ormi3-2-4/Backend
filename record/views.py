@@ -4,6 +4,7 @@ from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.pagination import PageNumberPagination
 from common.utils import error_response, success_response
 from record.serializers import RecordSerializer
 from record.models import Record, RecordImage
@@ -34,13 +35,17 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 )
 class RecordViewSet(ModelViewSet):
     """
-    API endpoint that allows users to be viewed or edited.
+    운동 기록을 처리합니다.
+    
+    Pagination default parameters: page=1, size=10
+    
     """
-
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Record.objects.all()
     serializer_class = RecordSerializer
-
+    
+    def get_queryset(self):
+        return super().get_queryset().filter(user=self.request.user)
     # @extend_schema(
     #     description="운동 종료 후 운동 기록을 저장합니다.",
     #     request=RecordCoordinatesSerializer,

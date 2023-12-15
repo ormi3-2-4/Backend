@@ -59,11 +59,13 @@ class RecordSerializer(serializers.ModelSerializer):
             "time",
             "created_at",
             "kind",
-            "images",
+            "images"
         ]
         read_only_fields = ["id", "created_at"]
 
     def get_time(self, obj: Record):
+        if obj.start_at is None or obj.end_at is None:
+            return None
         time_diff: timedelta = obj.end_at - obj.start_at
         sec = time_diff.seconds
 

@@ -2,7 +2,7 @@ from django.test import TestCase, Client
 from .serializers import UserLoginSerializer
 import json
 # Create your tests here.
-class RecordTest(TestCase):
+class UserTest(TestCase):
     def setUp(self):
         self.base_url = "http://localhost:8000"
         self.client = Client()
@@ -15,12 +15,22 @@ class RecordTest(TestCase):
         }
         print(self.user)
         
+        self.test_register()
+    def test_register(self):
         print("---------test_create---------")
         
         response = self.client.post(self.base_url + "/user/register/", data=self.user)
         print("---------register-----response.status_code---------")
+        if response.status_code != 201:
+            print("---------register-----response.data---------")
+            print(response.data)
         self.assertEqual(response.status_code, 201)
         print("---------register-----response.data---------", response.data)
+        self.token = response.data["data"]["token"]
+        self.user_id = response.data["data"]["user"]["id"]
+        self.headers = {}
+        self.headers["Authorization"] = "Bearer " + self.token["access_token"]
+        
         
     def test_login(self):
         print("---------test_login---------")
