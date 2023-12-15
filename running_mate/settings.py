@@ -1,6 +1,6 @@
 from datetime import timedelta
-from pathlib import Path
 from datetime import timedelta
+from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -15,7 +15,6 @@ SECRET_KEY = "django-insecure-#e06lhjqgl#vygqx_$3$%s&8uv@l=n$^0j^)d*fljo%@hhawa-
 DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
-
 
 # Application definition
 
@@ -155,13 +154,10 @@ REST_FRAMEWORK = {
 
 # drf-spectacular
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'schema',
-    'DESCRIPTION': '운동 기록을 공유하는 SNS 서비스',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': True,
+    "TITLE": "schema",
+    "DESCRIPTION": "운동 기록을 공유하는 SNS 서비스",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": True,
     # OTHER SETTINGS
 }
-
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
 AUTH_USER_MODEL = "user.User"
