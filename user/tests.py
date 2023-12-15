@@ -2,7 +2,7 @@ from django.test import TestCase, Client
 
 
 # Create your tests here.
-class RecordTest(TestCase):
+class UserTest(TestCase):
     def setUp(self):
         self.base_url = "http://localhost:8000"
         self.client = Client()
