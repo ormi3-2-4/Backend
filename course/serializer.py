@@ -41,7 +41,7 @@ class CourseListSerializer(serializers.ModelSerializer):
 class CourseDetailSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     record = RecordSerializer()
-    tags = TagSerializer(many=True)
+    tags = serializers.CharField()
 
     class Meta:
         model = Course
