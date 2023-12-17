@@ -1,12 +1,4 @@
 from django.contrib.auth import get_user_model
-<<<<<<< HEAD
-from rest_framework import generics
-from rest_framework import permissions, status
-from .serializers import UserSerializer, ChangePasswordSerializer
-from rest_framework.views import APIView
-from rest_framework.response import Response
-
-=======
 from django.http import Http404, HttpRequest
 from rest_framework import permissions
 from rest_framework.generics import get_object_or_404
@@ -20,18 +12,11 @@ from rest_framework.status import (
 from rest_framework.views import APIView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from user.serializers import UserLoginSerializer, UserSerializer
->>>>>>> dev
 
 User = get_user_model()
 
 
-<<<<<<< HEAD
-class UserCreateView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-=======
 class UserLoginView(APIView):
->>>>>>> dev
     permission_classes = [permissions.AllowAny]
     http_method_names = ["post"]
 
@@ -57,7 +42,6 @@ class UserLoginView(APIView):
         return Response(serializer.errors, HTTP_400_BAD_REQUEST)
 
 
-<<<<<<< HEAD
 class UserDetailView(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -76,7 +60,6 @@ class ChangePasswordView(APIView):
                 {"detail": "비밀번호가 성공적으로 변경되었습니다."}, status=status.HTTP_200_OK
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-=======
 class UserRegisterView(APIView):
     permission_classes = [permissions.AllowAny]
     http_method_names = ["post"]
@@ -96,4 +79,3 @@ class UserRegisterView(APIView):
             }
             return Response(data, HTTP_201_CREATED)
         return Response(serializer.errors, HTTP_400_BAD_REQUEST)
->>>>>>> dev
