@@ -1,13 +1,15 @@
-from rest_framework import serializers
 from django.contrib.auth import get_user_model
-
+from rest_framework import serializers
 
 User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
+    profile_image = serializers.ImageField(allow_null=True, required=False)
+
     class Meta:
         model = User
+<<<<<<< HEAD
         fields = ("id", "username", "email", "password", "nickname", "profile_image")
         extra_kwargs = {"password": {"write_only": True}}
 
@@ -31,3 +33,20 @@ class ChangePasswordSerializer(serializers.Serializer):
         user.set_password(self.validated_date["new_password"])
         user.save()
         return user
+=======
+        fields = ("id", "email", "password", "nickname", "profile_image")
+        extra_kwargs = {"password": {"write_only": True}}
+        read_only_fields = ["id"]
+
+        def create(self, validated_data):
+            user = User.objects.create_user(**validated_data)
+            return user
+
+
+class UserLoginSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(required=True)
+
+    class Meta:
+        model = User
+        fields = ("email", "password")
+>>>>>>> dev
