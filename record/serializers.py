@@ -1,5 +1,7 @@
 from datetime import timedelta
+
 from rest_framework import serializers
+
 from record.models import Record, RecordImage
 
 
@@ -61,7 +63,7 @@ class RecordSerializer(serializers.ModelSerializer):
             "kind",
             "images",
         ]
-        read_only_fields = ["id", "created_at"]
+        read_only_fields = ["id", "user", "created_at"]
 
     def get_time(self, obj: Record):
         time_diff: timedelta = obj.end_at - obj.start_at
