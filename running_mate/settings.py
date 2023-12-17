@@ -120,6 +120,9 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # dj-rest-auth
+REST_AUTH_SERIALIZERS = {
+    'PASSWORD_RESET_SERIALIZER': 
+        'user.serializers.PasswordResetSerializer',}
 REST_USE_JWT = True  # JWT 사용 여부
 JWT_AUTH_COOKIE = "my-app-auth"  # 호출할 Cookie Key 값
 JWT_AUTH_REFRESH_COOKIE = "my-refresh-token"  # Refresh Token Cookie Key 값
