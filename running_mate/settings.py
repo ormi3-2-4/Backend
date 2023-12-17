@@ -34,9 +34,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # third-party
     "rest_framework",
     "rest_framework_simplejwt",
     "drf_spectacular",
+    "storages"
+    # local
     "record",
     "course",
     "community",
@@ -122,8 +125,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
-MEDIA_URL = "media/"
-MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -153,8 +154,6 @@ SIMPLE_JWT = {
     "USER_ID_CLAIM": "user_id",
 }
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
@@ -174,3 +173,15 @@ SPECTACULAR_SETTINGS = {
     # OTHER SETTINGS
 }
 AUTH_USER_MODEL = "user.User"
+
+# AWS
+AWS_ACCESS_KEY_ID = getenv("S3_ACCESS_KEY")
+AWS_SECRET_ACCESS_KEY = getenv("S3_SECRET_ACCESS_KEY")
+AWS_REGION = "ap-northeast-2"
+
+# S3
+AWS_STORAGE_BUCKET_NAME = getenv("BUCKET_NAME")
+S3_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com"
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media"
