@@ -1,18 +1,27 @@
 from datetime import timedelta
 from datetime import timedelta
+from os import getenv
 from pathlib import Path
+
+import environ
+import pymysql
+
+pymysql.install_as_MySQLdb()
+
+env = environ.Env(DEBUG=(bool, True))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+environ.Env.read_env(BASE_DIR / ".env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-#e06lhjqgl#vygqx_$3$%s&8uv@l=n$^0j^)d*fljo%@hhawa-"
+SECRET_KEY = getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = getenv("DEBUG")
 
 ALLOWED_HOSTS = ["*"]
 
@@ -71,8 +80,12 @@ ASGI_APPLICATION = "running_mate.asgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": getenv("DB_NAME"),
+        "USER": getenv("DB_USER"),
+        "PASSWORD": getenv("DB_PW"),
+        "HOST": getenv("DB_HOST"),
+        "PORT": getenv("DB_PORT"),
     }
 }
 
