@@ -1,4 +1,5 @@
 import json
+from typing import Any
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.gis.geos import LineString
 from django.http import Http404, HttpRequest
@@ -10,8 +11,7 @@ from common.utils import error_response, success_response
 from record.serializers import RecordSerializer
 from record.models import Record, RecordImage
 from drf_spectacular.utils import extend_schema, extend_schema_view
-
-
+from .permissions import UserPermission
 @extend_schema_view(
     list=extend_schema(  # GET record/
         description="로그인을 한 유저가 생성했던 운동기록을 모두 가져옵니다.",
@@ -41,7 +41,7 @@ class RecordViewSet(ModelViewSet):
     Pagination default parameters: page=1
     
     """
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [UserPermission]
     queryset = Record.objects.all()
     serializer_class = RecordSerializer
     
@@ -73,17 +73,21 @@ class RecordViewSet(ModelViewSet):
         serializer = self.get_serializer(instance)
         record = serializer.data
         try:
-            old_coords = json.loads(record["coords"])
+            old_coords = json.loads(record["coords"]["coordinates"])
         except TypeError:
             old_coords = []
         merged_coords = old_coords + update_coords
         
         try:
             line = LineString(merged_coords, srid=4326)
-            request.data["distance"] = round(line.length*1000,2) # kilometer
+            coords = {}
+            coords["type"] = "LineString"
+            coords["coordinates"] = merged_coords
+            request.data["coords"] = coords
         except:
-            return error_response("좌표를 입력해주세요.", status.HTTP_400_BAD_REQUEST)
-        request.data["coords"] = json.dumps(merged_coords)
+            return error_response("좌표를 입력해주세요2.", status.HTTP_400_BAD_REQUEST)
+        request.data["distance"] = round(line.length*1000,2) # kilometer
+        
         return self.partial_update(request, *args, **kwargs)
         
     @extend_schema(
@@ -111,3 +115,7 @@ class RecordViewSet(ModelViewSet):
             )
         except Http404:
             return error_response("존재하지 않는 운동 기록입니다.", status.HTTP_404_NOT_FOUND)
+
+    
+    
+    

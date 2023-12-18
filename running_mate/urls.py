@@ -8,11 +8,17 @@ from drf_spectacular.views import (
 )
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import TemplateView
+from record.models import Record
+from djgeojson.views import GeoJSONLayerView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("user/", include("user.urls")),
     path('record/', include('record.urls')),
+    path('maps/<int:pk>/', TemplateView.as_view(template_name='maps.html'), name='maps'),
+    path('data.geojson', GeoJSONLayerView.as_view(model=Record,
+        properties=('coords'), geometry_field="coords"), name='data',),
     path('course/', include('course.urls')),
     
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),

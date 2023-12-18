@@ -56,7 +56,7 @@ class RecordTest(UserTest):
         print("---------response.data---------")
         print(response.data)
         self.assertEqual(response.status_code, 200)
-        coords = json.loads(response.data["coords"])
+        coords = json.loads(response.data["coords"]["coordinates"])
         print("---------coords---------")
         for (lat, lng) in coords:
             print(lat, lng)
@@ -120,7 +120,7 @@ class RecordTest(UserTest):
         print(response.data)
         self.assertEqual(response.status_code, 200)
         self.record = response.data
-        coords = json.loads(response.data["coords"])
+        coords = json.loads(response.data["coords"]["coordinates"])
         print("---------coords---------")
         for (lat, lng) in coords:
             print(lat, lng)
