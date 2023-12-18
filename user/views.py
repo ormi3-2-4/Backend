@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.http import Http404, HttpRequest
 from rest_framework import permissions, generics
-from rest_framework.generics import get_object_or_404
+from rest_framework.generics import get_object_or_404, RetrieveUpdateAPIView
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
@@ -11,7 +11,12 @@ from rest_framework.status import (
 )
 from rest_framework.views import APIView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from user.serializers import UserLoginSerializer, UserSerializer
+from user.serializers import (
+    UserLoginSerializer,
+    UserSerializer,
+    ChangePasswordSerializer,
+    UserUpdateSerializer,
+)
 
 User = get_user_model()
 
@@ -46,19 +51,19 @@ class UserDetailView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
 
 
-# class ChangePasswordView(APIView):
-#     permission_classes = [permissions.IsAuthenticated]
+class ChangePasswordView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
 
-#     def put(self, request):
-#         serializer = ChangePasswordSerializer(
-#             data=request.data, context={"request": request}
-#         )
-#         if serializer.is_valid():
-#             user = serializer.save()
-#             return Response(
-#                 {"detail": "비밀번호가 성공적으로 변경되었습니다."}, status=status.HTTP_200_OK
-#             )
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def put(self, request):
+        serializer = ChangePasswordSerializer(
+            data=request.data, context={"request": request}
+        )
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response({"detail": "비밀번호가 성공적으로 변경되었습니다."}, status=HTTP_200_OK)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+
 class UserRegisterView(APIView):
     permission_classes = [permissions.AllowAny]
     http_method_names = ["post"]
@@ -78,3 +83,13 @@ class UserRegisterView(APIView):
             }
             return Response(data, HTTP_201_CREATED)
         return Response(serializer.errors, HTTP_400_BAD_REQUEST)
+
+
+class UserUpdateView(RetrieveUpdateAPIView):
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
+    serializer_class = UserUpdateSerializer
+
+    def get_object(self):
+        return self.request.user
