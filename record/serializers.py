@@ -2,49 +2,12 @@ from datetime import timedelta
 from rest_framework import serializers
 from record.models import Record, RecordImage
 
-
-# class RecordImageSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = RecordImage
-#         fields = ["image"]
-
-
-# class RecordSerializer(serializers.ModelSerializer):
-#     image = RecordImageSerializer(many=True, read_only=True)
-
-#     class Meta:
-#         model = Record
-#         fields = "__all__"
-
-
-# class RecordCoordinatesSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Record
-#         fields = ["coords"]
-
-
-# class CalculateSerializer(serializers.BaseSerializer):
-#     distance = serializers.SerializerMethodField()
-#     speed = serializers.SerializerMethodField()
-#     calories = serializers.SerializerMethodField()
-
-#     @property
-#     def distance(self, obj):
-#         return obj.distance
-
-#     @property
-#     def speed(self, obj):
-#         return obj.speed
-
-#     @property
-#     def calories(self, obj):
-#         return obj.calories
-
-
 class RecordSerializer(serializers.ModelSerializer):
     time = serializers.SerializerMethodField()
     images = serializers.SerializerMethodField()
-
+    calorie = serializers.SerializerMethodField()
+    speed = serializers.SerializerMethodField()
+    
     class Meta:
         model = Record
         fields = [
@@ -59,7 +22,8 @@ class RecordSerializer(serializers.ModelSerializer):
             "time",
             "created_at",
             "kind",
-            "images"
+            "images",
+            "calorie"
         ]
         read_only_fields = ["id", "created_at"]
 
@@ -76,3 +40,24 @@ class RecordSerializer(serializers.ModelSerializer):
     def get_images(self, obj: Record):
         images = RecordImage.objects.filter(record=obj)
         return [record_image.image.url for record_image in images]
+
+    def get_speed(self, obj: Record):
+        if obj.start_at is None or obj.end_at is None:
+            return None
+        time_diff: timedelta = obj.end_at - obj.start_at
+        sec = time_diff.seconds
+        
+        try:
+            return obj.distance / sec*60*60
+        except:
+            return None
+    
+    def get_calorie(self, obj: Record):
+        if obj.start_at is None or obj.end_at is None:
+            return None
+        # 60kg 체중 기준 칼로리 계산.
+        try:
+            return obj.distance * 60
+        except:
+            return None
+    

@@ -47,14 +47,16 @@ class RecordViewSet(ModelViewSet):
     
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
-    # @extend_schema(
-    #     description="운동 종료 후 운동 기록을 저장합니다.",
-    #     request=RecordCoordinatesSerializer,
-    #     responses={200: RecordSerializer},
-    # )
-    # @action(detail=False, methods=["POST"], url_path="(?P<pk>[0-9]+)/finish")
-    # def finish(self, request, pk):
-    #     pass
+    
+    @extend_schema(
+        description="운동 종료 후 운동 기록을 저장합니다.",
+        request=RecordSerializer,
+        responses={200: RecordSerializer},
+    )
+    @action(detail=False, methods=["PATCH"], url_path="(?P<pk>[0-9]+)/finish")
+    def finish(self, *args, **kwargs):
+        return self.partial_update(*args, **kwargs)
+        
     @extend_schema(
         description="운동 중인 유저의 운동 거리 계산",
         request=RecordSerializer,
@@ -62,7 +64,6 @@ class RecordViewSet(ModelViewSet):
     )
     @action(detail=False, methods=["PATCH"], url_path="(?P<pk>[0-9]+)/calculate")
     def calculate(self, request, *args, **kwargs):
-        
         try:
             update_coords = json.loads(request.data["coords"])
         except TypeError:
