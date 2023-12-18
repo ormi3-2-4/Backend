@@ -1,10 +1,11 @@
+import json
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.gis.geos import LineString
 from django.http import Http404, HttpRequest
 from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.pagination import PageNumberPagination
 from common.utils import error_response, success_response
 from record.serializers import RecordSerializer
 from record.models import Record, RecordImage
@@ -37,7 +38,7 @@ class RecordViewSet(ModelViewSet):
     """
     운동 기록을 처리합니다.
     
-    Pagination default parameters: page=1, size=10
+    Pagination default parameters: page=1
     
     """
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -54,16 +55,36 @@ class RecordViewSet(ModelViewSet):
     # @action(detail=False, methods=["POST"], url_path="(?P<pk>[0-9]+)/finish")
     # def finish(self, request, pk):
     #     pass
-
-    # @extend_schema(
-    #     description="운동 중인 유저의 칼로리 소모량 계산, 평균 속력 계산, 운동 거리 계산",
-    #     request=RecordCoordinatesSerializer,
-    #     responses={200: RecordSerializer},
-    # )
-    # @action(detail=False, methods=["POST"], url_path="(?P<pk>[0-9]+)/calculate")
-    # def calculate(self, request, pk):
-    #     pass
-
+    @extend_schema(
+        description="운동 중인 유저의 운동 거리 계산",
+        request=RecordSerializer,
+        responses={200: RecordSerializer},
+    )
+    @action(detail=False, methods=["PATCH"], url_path="(?P<pk>[0-9]+)/calculate")
+    def calculate(self, request, *args, **kwargs):
+        
+        try:
+            update_coords = json.loads(request.data["coords"])
+        except TypeError:
+            return error_response("좌표를 입력해주세요.", status.HTTP_400_BAD_REQUEST)
+        
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        record = serializer.data
+        try:
+            old_coords = json.loads(record["coords"])
+        except TypeError:
+            old_coords = []
+        merged_coords = old_coords + update_coords
+        
+        try:
+            line = LineString(merged_coords, srid=4326)
+            request.data["distance"] = round(line.length*1000,2) # kilometer
+        except:
+            return error_response("좌표를 입력해주세요.", status.HTTP_400_BAD_REQUEST)
+        request.data["coords"] = json.dumps(merged_coords)
+        return self.partial_update(request, *args, **kwargs)
+        
     @extend_schema(
         description="인증샷을 추가합니다.",
         operation_id="upload_file",

@@ -1,14 +1,17 @@
 from django.test import TestCase, Client
 import json
-from record.models import Record
-from django.db.models.functions import Concat
-from django.db.models import CharField, Value
-from .serializers import RecordSerializer
-from django.contrib.auth import get_user_model
-from user.serializers import UserSerializer, UserLoginSerializer
-from user.tests import UserTest
 
-# Create your tests here.
+from user.tests import UserTest
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.contrib.gis.geos import LineString
+
+# gdal 설치 필요
+# brew install gdal (mac)
+# sudo apt-get install binutils libproj-dev gdal-bin (window + WSL)
+# yum --enablerepo=epel -y install gdal gdal-devel .config 파일에 추가 (AWS)
+# https://oneone-note.tistory.com/42
+
+
 class RecordTest(UserTest):
     def setUp(self):
         super().setUp()
@@ -41,17 +44,10 @@ class RecordTest(UserTest):
         
     def test_record_update(self):
         print("---------test_record_update---------")
-        # self.user["email"] = "test2@example.com"
-        # self.test_register()
         self.headers["Content-Type"] = "application/json"
         update_coords = [(37.123, 127.123), (37.123, 127.123), (37.123, 127.123), (37.123, 127.123), (37.123, 127.123)]
         
-        self.record["coords"] = update_coords
-    
-        old_coords = self.record["coords"]
-        merged_coords = old_coords + update_coords
-        
-        self.record["coords"] = json.dumps(merged_coords)
+        self.record["coords"] = json.dumps(update_coords)
         print("---------merged_coords---------")
         print(self.record)
         response = self.client.patch(self.base_url + "/record/" + str(self.record["id"]) + "/", headers=self.headers, data=json.dumps(self.record))
@@ -98,4 +94,39 @@ class RecordTest(UserTest):
         print("---------response.data---------")
         print(response.data)
     
+    def test_image_upload(self):
+        print("---------test_image_upload---------")
+        image = SimpleUploadedFile("test_image.jpg", b"file_content", content_type="image/jpeg")
+        response = self.client.post(self.base_url + "/record/" + str(self.record["id"]) + "/image/", headers=self.headers, data={"image": image})
+        print("---------response.data---------")
+        print(response.data)
+            
+        self.assertEqual(response.status_code, 201)
+        
+        self.test_record_detail()
     
+    def test_calculate(self):
+        print("---------test_calculate---------")
+        self.headers["Content-Type"] = "application/json"
+        update_coords = [(126.76514625549316, 37.64388603051884),(126.76929831504823, 37.64818454268491), (126.77118659019472, 37.64708870056084), (126.76916956901552, 37.64825250135397)]
+        
+        self.record["coords"] = json.dumps(update_coords)
+        print("---------merged_coords---------")
+        print(self.record)
+        response = self.client.patch(self.base_url + "/record/" + str(self.record["id"]) + "/calculate/", headers=self.headers, data=json.dumps(self.record))
+        print("---------response.status_code---------")
+        
+        print("---------response.data---------")
+        print(response.data)
+        self.assertEqual(response.status_code, 200)
+        coords = json.loads(response.data["coords"])
+        print("---------coords---------")
+        for (lat, lng) in coords:
+            print(lat, lng)
+    
+    def test_distance(self):
+        print("---------test_distance---------")
+        line = LineString([(126.76514625549316, 37.64388603051884),(126.76929831504823, 37.64818454268491), (126.77118659019472, 37.64708870056084), (126.76916956901552, 37.64825250135397)], srid=4326)
+
+        print(round(line.length*1000, 2)) 
+        
