@@ -63,7 +63,14 @@ class RecordSerializer(serializers.ModelSerializer):
             "kind",
             "images",
         ]
-        read_only_fields = ["id", "user", "created_at"]
+        read_only_fields = [
+            "id",
+            "user",
+            "created_at",
+            "start_at",
+            "end_at",
+            "static_map",
+        ]
 
     def get_time(self, obj: Record):
         time_diff: timedelta = obj.end_at - obj.start_at
