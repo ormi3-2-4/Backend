@@ -2,9 +2,13 @@
 from rest_framework import (
     viewsets,  # ViewSet 클래스를 사용하기 위한 import
     status,  # HTTP 상태 코드를 사용하기 위한 import
+    filters,  # 검색 및 필터링을 위한 import
 )
 from rest_framework.response import Response  # API 응답을 생성하기 위한 import
 from rest_framework.permissions import IsAuthenticatedOrReadOnly  # 인증 권한을 사용하기 위한 import
+
+# Django
+from django.db.models import Q  # Q 객체를 사용하기 위한 import
 
 # app
 from .models import Community, CommunityComment  # Community, CommunityComment 모델 import
@@ -41,3 +45,12 @@ class CommunityView(viewsets.ModelViewSet):
             return super().destroy(request, *args, **kwargs)
         else:
             return Response({'detail': '글 삭제 권한이 없습니다.'}, status=status.HTTP_403_FORBIDDEN)
+
+    def get_queryset(self):
+        # 검색어에 따라 필터링
+        queryset = Community.objects.all()
+        search_keyword = self.request.query_params.get('search', None)
+        if search_keyword:
+            # Q 객체를 사용하여 제목 또는 내용에서 검색
+            queryset = queryset.filter(Q(title__icontains=search_keyword) | Q(content__icontains=search_keyword))
+        return queryset
