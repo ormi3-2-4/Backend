@@ -9,7 +9,7 @@ from rest_framework.response import Response  # API 응답을 생성하기 위�
 from rest_framework.permissions import IsAuthenticatedOrReadOnly  # 인증 권한을 사용하기 위한 import
 
 # Django
-from django.db.models import Q  # Q 객체를 사용하기 위한 import
+from django.db.models import F, Q  # F 객체와 Q 객체를 사용하기 위한 import
 
 # app
 from .models import Community, CommunityComment  # Community, CommunityComment 모델 import
@@ -71,3 +71,11 @@ class CommunityView(viewsets.ModelViewSet):
             return Response({'liked': liked})
         else:
             return Response({'detail': '인증되지 않은 사용자입니다.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        # 게시글 조회 시 조회수 증가
+        instance.view_count = F('view_count') + 1
+        instance.save()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
