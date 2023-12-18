@@ -9,6 +9,7 @@ from rest_framework.response import Response  # API 응답을 생성하기 위�
 from rest_framework.permissions import IsAuthenticatedOrReadOnly  # 인증 권한을 사용하기 위한 import
 
 # Django
+from django.shortcuts import get_object_or_404 # 404 에러 시 객체를 가져오거나 404 에러 발생
 from django.db.models import F, Q  # F 객체와 Q 객체를 사용하기 위한 import
 
 # app
@@ -79,3 +80,36 @@ class CommunityView(viewsets.ModelViewSet):
         instance.save()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
+
+
+class CommunityCommentView(viewsets.ModelViewSet):
+    queryset = CommunityComment.objects.all()
+    serializer_class = CommunityCommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def list(self, request, *args, **kwargs):
+        # 게시글에 연결된 댓글 가져오기
+        community = get_object_or_404(Community, pk=self.kwargs['pk'])
+        comments = self.queryset.filter(community=community)
+        serializer = self.get_serializer(comments, many=True)
+        return Response(serializer.data)
+
+    def perform_create(self, serializer):
+        # 새로운 커뮤니티 댓글이 생성될 때, 해당 댓글의 작성자를 현재 요청을 보낸 사용자로 설정
+        serializer.save(user=self.request.user)
+
+    def update(self, request, *args, **kwargs):
+        # 댓글 수정은 작성자만 가능
+        comment = self.get_object()
+        if comment.user == request.user:
+            return super().update(request, *args, **kwargs)
+        else:
+            return Response({'detail': '댓글 수정 권한이 없습니다.'}, status=status.HTTP_403_FORBIDDEN)
+
+    def destroy(self, request, *args, **kwargs):
+        # 댓글 삭제는 작성자만 가능
+        comment = self.get_object()
+        if comment.user == request.user:
+            return super().destroy(request, *args, **kwargs)
+        else:
+            return Response({'detail': '댓글 삭제 권한이 없습니다.'}, status=status.HTTP_403_FORBIDDEN)
