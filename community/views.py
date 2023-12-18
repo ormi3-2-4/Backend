@@ -4,6 +4,7 @@ from rest_framework import (
     status,  # HTTP 상태 코드를 사용하기 위한 import
     filters,  # 검색 및 필터링을 위한 import
 )
+from rest_framework.decorators import action  # 액션 데코레이터를 사용하기 위한 import
 from rest_framework.response import Response  # API 응답을 생성하기 위한 import
 from rest_framework.permissions import IsAuthenticatedOrReadOnly  # 인증 권한을 사용하기 위한 import
 
@@ -54,3 +55,19 @@ class CommunityView(viewsets.ModelViewSet):
             # Q 객체를 사용하여 제목 또는 내용에서 검색
             queryset = queryset.filter(Q(title__icontains=search_keyword) | Q(content__icontains=search_keyword))
         return queryset
+
+    @action(detail=True, methods=['post'])
+    def like(self, request, pk=None):
+        # 커뮤니티 게시글에 좋아요 추가, 만약 이미 좋아요를 한 사용자일 경우 좋아요 취소
+        community = self.get_object()
+        user = request.user
+        if user.is_authenticated:
+            if community.likes.filter(id=user.id).exists():
+                community.likes.remove(user)
+                liked = False
+            else:
+                community.likes.add(user)
+                liked = True
+            return Response({'liked': liked})
+        else:
+            return Response({'detail': '인증되지 않은 사용자입니다.'}, status=status.HTTP_401_UNAUTHORIZED)
