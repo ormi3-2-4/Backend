@@ -73,7 +73,7 @@ class RecordViewSet(ModelViewSet):
         try:
             update_coords = json.loads(request.data["coords"])
         except TypeError:
-            return error_response("좌표를 입력해주세요.", status.HTTP_400_BAD_REQUEST)
+            return Response("좌표를 입력해주세요.", status.HTTP_400_BAD_REQUEST)
 
         instance = self.get_object()
         serializer = self.get_serializer(instance)
@@ -91,7 +91,7 @@ class RecordViewSet(ModelViewSet):
             coords["coordinates"] = merged_coords
             request.data["coords"] = coords
         except:
-            return error_response("좌표를 입력해주세요2.", status.HTTP_400_BAD_REQUEST)
+            return Response("좌표를 입력해주세요2.", status.HTTP_400_BAD_REQUEST)
         request.data["distance"] = round(line.length * 1000, 2)  # kilometer
 
         return self.partial_update(request, *args, **kwargs)
@@ -120,6 +120,7 @@ class RecordViewSet(ModelViewSet):
         except Http404:
             return Response("존재하지 않는 운동 기록입니다.", status.HTTP_404_NOT_FOUND)
 
+
 class LeafletView(DetailView):
     model = Record
     template_name = "maps.html"
@@ -136,4 +137,3 @@ class LeafletView(DetailView):
             ),
         }
         return context
-
