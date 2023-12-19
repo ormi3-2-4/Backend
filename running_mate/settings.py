@@ -159,13 +159,16 @@ REST_FRAMEWORK = {
 
 # drf-spectacular
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'schema',
-    'DESCRIPTION': '운동 기록을 공유하는 SNS 서비스',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': True,
+    "TITLE": "schema",
+    "DESCRIPTION": "운동 기록을 공유하는 SNS 서비스",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": True,
     # OTHER SETTINGS
 }
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 AUTH_USER_MODEL = "user.User"
+
+# leaflet
+LEAFLET_CONFIG = {"DEFAULT_ZOOM": 10}
