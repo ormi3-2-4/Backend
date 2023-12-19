@@ -4,7 +4,7 @@ from rest_framework import (
     status,  # HTTP 상태 코드를 사용하기 위한 import
     filters,  # 검색 및 필터링을 위한 import
 )
-from rest_framework.decorators import action  # 액션 데코레이터를 사용하기 위한 import
+from rest_framework.decorators import action, extend_schema, extend_schema_view  # 액션 데코레이터 및 스키마 확장 데코레이터를 사용하기 위한 import
 from rest_framework.response import Response  # API 응답을 생성하기 위한 import
 from rest_framework.permissions import IsAuthenticatedOrReadOnly  # 인증 권한을 사용하기 위한 import
 from rest_framework.pagination import PageNumberPagination # 페이지네이션
@@ -20,7 +20,35 @@ from .serializers import (  # Serializer 클래스 import
     CommunityCommentSerializer,
 )
 
-
+@extend_schema_view(
+    list=extend_schema(
+        description="게시글 목록",
+        responses={200: CommunitySerializer(many=True)},
+    ),
+    retrieve=extend_schema(
+        description="게시글 상세 조회",
+        responses={200: CommunitySerializer()},
+    ),
+    create=extend_schema(
+        description="게시글 작성 (인증 필요)",
+        request=CommunitySerializer(),
+        responses={201: CommunitySerializer()},
+    ),
+    update=extend_schema(
+        description="게시글 수정 (작성자만 가능)",
+        request=CommunitySerializer(),
+        responses={200: CommunitySerializer()},
+    ),
+    destroy=extend_schema(
+        description="게시글 삭제 (작성자만 가능)",
+        responses={204: "No Content"},
+    ),
+    like=extend_schema(
+        description="게시글 좋아요 또는 취소 (인증 필요)",
+        request=CommunitySerializer(),
+        responses={200: CommunitySerializer()},
+    ),
+)
 class CommunityView(viewsets.ModelViewSet):
     queryset = Community.objects.all()
     serializer_class = CommunitySerializer
@@ -28,7 +56,7 @@ class CommunityView(viewsets.ModelViewSet):
     search_fields = ['title', 'content']
     ordering_fields = ['created_at', 'view_count']
     permission_classes = [IsAuthenticatedOrReadOnly]
-
+    
     pagination_class = PageNumberPagination
     page_size = 10  # 10개씩 페이징
 
@@ -63,7 +91,7 @@ class CommunityView(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def like(self, request, pk=None):
-        # 커뮤니티 게시글에 좋아요 추가, 만약 이미 좋아요를 한 사용자일 경우 좋아요 취소
+        # 커뮤니티 게시글에 좋아요 추가, 이미 좋아요를 한 사용자일 경우 좋아요 취소
         community = self.get_object()
         user = request.user
         if user.is_authenticated:
@@ -86,6 +114,26 @@ class CommunityView(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
+@extend_schema_view(
+    list=extend_schema(
+        description="특정 게시글에 대한 댓글 목록",
+        responses={200: CommunityCommentSerializer(many=True)},
+    ),
+    create=extend_schema(
+        description="댓글 작성 (인증 필요)",
+        request=CommunityCommentSerializer(),
+        responses={201: CommunityCommentSerializer()},
+    ),
+    update=extend_schema(
+        description="댓글 수정 (작성자만 가능)",
+        request=CommunityCommentSerializer(),
+        responses={200: CommunityCommentSerializer()},
+    ),
+    destroy=extend_schema(
+        description="댓글 삭제 (작성자만 가능)",
+        responses={204: "No Content"},
+    ),
+)
 class CommunityCommentView(viewsets.ModelViewSet):
     queryset = CommunityComment.objects.all()
     serializer_class = CommunityCommentSerializer
