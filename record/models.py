@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
-
+from djgeojson.fields import LineStringField
 
 User = get_user_model()
 
@@ -24,14 +24,13 @@ class Record(models.Model):
     static_map = models.ImageField(
         upload_to="record/static_map/%Y/%m/%d/", blank=True, null=True
     )
-    coords = models.TextField(help_text="GPS데이터", blank=True, null=True)
+    coords = LineStringField(help_text="GPS데이터", blank=True, null=True)
     distance = models.FloatField(help_text="운동한 거리", blank=True, null=True)
-    speed = models.FloatField(help_text="평균 속력", default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     kind = models.CharField(
         choices=Kind, max_length=10, default=Kind.RUN, help_text="운동 종류"
     )
-
+    
     def __str__(self):
         return f"{self.user}: {self.start_at}"
 
