@@ -7,6 +7,7 @@ from rest_framework import (
 from rest_framework.decorators import action  # 액션 데코레이터를 사용하기 위한 import
 from rest_framework.response import Response  # API 응답을 생성하기 위한 import
 from rest_framework.permissions import IsAuthenticatedOrReadOnly  # 인증 권한을 사용하기 위한 import
+from rest_framework.pagination import PageNumberPagination # 페이지네이션
 
 # Django
 from django.shortcuts import get_object_or_404 # 404 에러 시 객체를 가져오거나 404 에러 발생
@@ -27,6 +28,9 @@ class CommunityView(viewsets.ModelViewSet):
     search_fields = ['title', 'content']
     ordering_fields = ['created_at', 'view_count']
     permission_classes = [IsAuthenticatedOrReadOnly]
+
+    pagination_class = PageNumberPagination
+    page_size = 10  # 10개씩 페이징
 
     def perform_create(self, serializer):
         # 새로운 커뮤니티 게시글이 생성될 때, 해당 게시글의 작성자를 현재 요청을 보낸 사용자로 설정
