@@ -4,36 +4,25 @@ from django.utils.translation import gettext_lazy as _
 
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, nickname, email, password):
+    def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError("이메일은 필수입니다.")
         email = self.normalize_email(email)
-        user = self.model(
-            nickname=nickname,
-            email=self.normalize_email(email),
-        )
-
+        user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, nickname, email, password):
-        user: User = self.create_user(
-            nickname=nickname,
-            email=self.normalize_email(email),
-            password=password,
-        )
-        user.is_staff = True
-        user.is_superuser = True
-        user.save(using=self._db)
-        return user
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        return self.create_user(email, password, **extra_fields)
 
 
 class User(AbstractBaseUser):
     email = models.EmailField(unique=True, help_text="이메일")
     nickname = models.CharField(max_length=20, help_text="닉네임")
     profile_image = models.ImageField(blank=True, upload_to="user/images", null=True)
-    password = models.CharField(_("password"), max_length=128)
     joined_at = models.DateTimeField(auto_now_add=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
@@ -55,10 +44,7 @@ class User(AbstractBaseUser):
         return self.nickname
 
     def has_perm(self, perm, obj=None):
-        return True
-    
-    def has_perms(self, perm, obj=None):
-        return True
+        return self.is_superuser
 
     def has_module_perms(self, app_label):
-        return True
+        return self.is_superuser
