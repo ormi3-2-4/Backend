@@ -7,7 +7,7 @@ class CommunityCommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CommunityComment
-        fields = ['id', 'community', 'user', 'content', 'parent_comment', 'created_at', 'updated_at']
+        fields = ['id', 'community', 'user', 'content', 'parent_comment', 'created_at', 'updated_at', 'user_username']
         read_only_fields = ['user']
 
     def get_user_username(self, obj):
