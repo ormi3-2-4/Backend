@@ -92,7 +92,11 @@ class CourseViewSet(ModelViewSet):
             q = Q(title__contains=query) | Q(content__contains=query)
             serializer = CourseListSerializer(self.get_queryset().filter(q), many=True)
 
-        return Response(serializer.data, status.HTTP_200_OK)
+        return Response({"data": serializer.data}, status.HTTP_200_OK)
+
+    def retrieve(self, request, *args, **kwargs):
+        result = super().retrieve(request, *args, **kwargs)
+        return Response({"data": result.data}, result.status_code)
 
     def create(self, request, *args, **kwargs):
         user = self.request.user

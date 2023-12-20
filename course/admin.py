@@ -19,6 +19,6 @@ class CourseAdmin(admin.ModelAdmin):
         "tags",
     ]
     inlines = []
-    readonly_fields = ["created_at", "view_count", "likes"]
+    readonly_fields = ["created_at", "view_count"]
     search_fields = ["title", "user"]
     ordering = ["-created_at"]

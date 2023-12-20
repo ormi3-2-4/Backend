@@ -14,8 +14,6 @@ class CoursePagination(PageNumberPagination):
 
 
 class CourseListSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
-
     class Meta:
         model = Course
         fields = [
