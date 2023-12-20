@@ -1,11 +1,11 @@
 from django.contrib import admin
 
 from record.models import Record, RecordImage
-
+from leaflet.admin import LeafletGeoAdmin
 
 # Register your models here.
 @admin.register(Record)
-class RecordAdmin(admin.ModelAdmin):
+class RecordAdmin(LeafletGeoAdmin):
     list_display = ["user", "created_at"]
     list_filter = ["user"]
     fields = [
@@ -15,7 +15,6 @@ class RecordAdmin(admin.ModelAdmin):
         "static_map",
         "coords",
         "distance",
-        "speed",
         "kind",
     ]
     readonly_fields = ["created_at"]

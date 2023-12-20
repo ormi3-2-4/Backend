@@ -1,14 +1,22 @@
-import json
-
 from django.contrib.auth import get_user_model
 from django.http import Http404, HttpRequest
-from rest_framework import permissions
-from rest_framework.generics import get_object_or_404
+from rest_framework import permissions, generics
+from rest_framework.generics import get_object_or_404, RetrieveUpdateAPIView
+from rest_framework.response import Response
+from rest_framework.status import (
+    HTTP_200_OK,
+    HTTP_201_CREATED,
+    HTTP_400_BAD_REQUEST,
+    HTTP_404_NOT_FOUND,
+)
 from rest_framework.views import APIView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-
-from common.utils import error_response, success_response
-from user.serializers import UserLoginSerializer, UserSerializer
+from user.serializers import (
+    UserLoginSerializer,
+    UserSerializer,
+    ChangePasswordSerializer,
+    UserUpdateSerializer,
+)
 
 User = get_user_model()
 
@@ -20,23 +28,40 @@ class UserLoginView(APIView):
     def post(self, request: HttpRequest):
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
-            try:
-                user = get_object_or_404(User, email=serializer.data["email"])
-            except Http404:
-                return error_response("유저가 존재하지 않습니다.", 404)
+            user = User.objects.filter(email=serializer.data["email"]).first()
+            if not user:
+                return Response("유저가 존재하지 않습니다.", HTTP_404_NOT_FOUND)
 
             token = TokenObtainPairSerializer.get_token(user)
             access_token = str(token.access_token)
             data = {
-                "user": serializer.data,
+                "user": UserSerializer(user).data,
                 "token": {
                     "access_token": access_token,
                     "refresh_token": str(token),
                 },
             }
 
-            return success_response(data, 200)
-        return error_response(serializer.errors, 400)
+            return Response(data, HTTP_200_OK)
+        return Response(serializer.errors, HTTP_400_BAD_REQUEST)
+
+
+class UserDetailView(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class ChangePasswordView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def put(self, request):
+        serializer = ChangePasswordSerializer(
+            data=request.data, context={"request": request}
+        )
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response({"detail": "비밀번호가 성공적으로 변경되었습니다."}, status=HTTP_200_OK)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
 class UserRegisterView(APIView):
@@ -56,5 +81,15 @@ class UserRegisterView(APIView):
                     "refresh_token": str(token),
                 },
             }
-            return success_response(data, 201)
-        return error_response(serializer.errors, 400)
+            return Response(data, HTTP_201_CREATED)
+        return Response(serializer.errors, HTTP_400_BAD_REQUEST)
+
+
+class UserUpdateView(RetrieveUpdateAPIView):
+    permission_classes = [
+        permissions.IsAuthenticated,
+    ]
+    serializer_class = UserUpdateSerializer
+
+    def get_object(self):
+        return self.request.user

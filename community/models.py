@@ -7,7 +7,9 @@ User = get_user_model()
 
 
 class Community(models.Model):
-    record = models.ForeignKey(to=Record, on_delete=models.CASCADE, null=True, help_text="운동기록")
+    record = models.ForeignKey(
+      to=Record, on_delete=models.CASCADE, null=True, help_text="운동기록"
+    )
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="community", help_text="작성자"
     )

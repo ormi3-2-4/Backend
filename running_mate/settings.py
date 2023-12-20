@@ -1,21 +1,29 @@
 from datetime import timedelta
-from pathlib import Path
 from datetime import timedelta
+from os import getenv
+from pathlib import Path
+
+import environ
+import pymysql
+
+pymysql.install_as_MySQLdb()
+
+env = environ.Env(DEBUG=(bool, True))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+environ.Env.read_env(BASE_DIR / ".env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-#e06lhjqgl#vygqx_$3$%s&8uv@l=n$^0j^)d*fljo%@hhawa-"
+SECRET_KEY = getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = getenv("DEBUG")
 
 ALLOWED_HOSTS = ["*"]
-
 
 # Application definition
 
@@ -26,14 +34,21 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # third-party
     "rest_framework",
     "rest_framework_simplejwt",
     "drf_spectacular",
+    "storages",
+    "dj_rest_auth",
+    
+    # local
     "record",
     "course",
     "community",
     "recommend",
     "user",
+    "djgeojson",
+    "leaflet",
 ]
 
 MIDDLEWARE = [
@@ -72,8 +87,12 @@ ASGI_APPLICATION = "running_mate.asgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": getenv("DB_NAME") if DEBUG else getenv("DB_REMOTE_NAME"),
+        "USER": getenv("DB_USER") if DEBUG else getenv("DB_REMOTE_USERNAME"),
+        "PASSWORD": getenv("DB_PW") if DEBUG else getenv("DB_REMOTE_PW"),
+        "HOST": getenv("DB_HOST") if DEBUG else getenv("DB_REMOTE_HOST"),
+        "PORT": getenv("DB_PORT") if DEBUG else getenv("DB_REMOTE_PORT"),
     }
 }
 
@@ -110,8 +129,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
-MEDIA_URL = "media/"
-MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -120,6 +137,9 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # dj-rest-auth
+REST_AUTH_SERIALIZERS = {
+    'PASSWORD_RESET_SERIALIZER': 
+        'user.serializers.PasswordResetSerializer',}
 REST_USE_JWT = True  # JWT 사용 여부
 JWT_AUTH_COOKIE = "my-app-auth"  # 호출할 Cookie Key 값
 JWT_AUTH_REFRESH_COOKIE = "my-refresh-token"  # Refresh Token Cookie Key 값
@@ -141,27 +161,39 @@ SIMPLE_JWT = {
     "USER_ID_CLAIM": "user_id",
 }
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
+        # "rest_framework.permissions.IsAuthenticated",
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "PAGE_SIZE": 10,
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
 }
 
 # drf-spectacular
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'schema',
-    'DESCRIPTION': '운동 기록을 공유하는 SNS 서비스',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': True,
+    "TITLE": "schema",
+    "DESCRIPTION": "운동 기록을 공유하는 SNS 서비스",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": True,
     # OTHER SETTINGS
 }
-
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
 AUTH_USER_MODEL = "user.User"
+
+# AWS
+AWS_ACCESS_KEY_ID = getenv("S3_ACCESS_KEY")
+AWS_SECRET_ACCESS_KEY = getenv("S3_SECRET_ACCESS_KEY")
+AWS_REGION = "ap-northeast-2"
+
+# S3
+AWS_STORAGE_BUCKET_NAME = getenv("BUCKET_NAME")
+S3_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com"
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+# leaflet
+LEAFLET_CONFIG = {"DEFAULT_ZOOM": 10}
