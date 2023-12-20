@@ -27,4 +27,3 @@ class RecordImageAdmin(admin.ModelAdmin):
     list_display = ["record"]
     list_filter = ["record"]
     fields = ["record", "image"]
-

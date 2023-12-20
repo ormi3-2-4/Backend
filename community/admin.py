@@ -12,8 +12,8 @@ from .models import Community, CommunityComment
 class CommunityAdmin(admin.ModelAdmin):
     list_display = ["id", "title", "user", "created_at"]
     list_filter = ["title", "user"]
-    fields = ["id", "title", "content", "created_at"]
-    readonly_fields = ["id", "user", "view_count", "likes", "created_at", "updated_at"]
+    fields = ["id", "title", "user", "content", "created_at"]
+    readonly_fields = ["id", "view_count", "likes", "created_at", "updated_at"]
     search_fields = ["title", "content"]
     ordering = ["-created_at"]
 
@@ -22,6 +22,7 @@ class CommunityAdmin(admin.ModelAdmin):
 class CommunityCommentAdmin(admin.ModelAdmin):
     list_display = ["id", "content", "user", "created_at"]
     list_filter = ["user"]
-    fields = ["id", "content", "user", "parent_comment", "created_at"]
-    readonly_fields = ["parent_comment", "id", "user", "created_at", "updated_at"]
+    fields = ["id", "content", "community", "user", "parent_comment", "created_at"]
+    readonly_fields = ["parent_comment", "id", "created_at", "updated_at"]
     search_fields = ["user", "content"]
+

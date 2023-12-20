@@ -69,4 +69,3 @@ class RecordSerializer(serializers.ModelSerializer):
             return obj.distance * 60
         except:
             return None
-    
