@@ -4,7 +4,8 @@ from rest_framework import (
     status,  # HTTP 상태 코드를 사용하기 위한 import
     filters,  # 검색 및 필터링을 위한 import
 )
-from rest_framework.decorators import action, extend_schema, extend_schema_view  # 액션 데코레이터 및 스키마 확장 데코레이터를 사용하기 위한 import
+from rest_framework.decorators import action  # 액션 데코레이터 import
+from drf_spectacular.utils import extend_schema, extend_schema_view # 스키마 import
 from rest_framework.response import Response  # API 응답을 생성하기 위한 import
 from rest_framework.permissions import IsAuthenticatedOrReadOnly  # 인증 권한을 사용하기 위한 import
 from rest_framework.pagination import PageNumberPagination # 페이지네이션
