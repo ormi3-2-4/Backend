@@ -66,12 +66,15 @@ class RecordSerializer(serializers.ModelSerializer):
         if obj.distance is None:
             return 0
 
-        return obj.distance / sec * 60 * 60
+        try:
+            return obj.distance / sec * 60 * 60
+        except ZeroDivisionError:
+            return 0
 
     def get_calorie(self, obj: Record):
         if obj.start_at is None or obj.end_at is None:
             return 0
-        # 60kg 체중 기준 칼로리 계산.
+
         if obj.distance is None:
             return 0
         return obj.distance * 60
