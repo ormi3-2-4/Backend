@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "storages",
     "dj_rest_auth",
+    "allauth",
     # local
     "record",
     "course",
