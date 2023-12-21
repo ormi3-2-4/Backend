@@ -32,6 +32,10 @@ class UserLoginView(APIView):
             if not user:
                 return Response("유저가 존재하지 않습니다.", HTTP_404_NOT_FOUND)
 
+            pass_match = user.check_password(serializer.data["password"])
+            if not pass_match:
+                return Response({"error": "비밀번호가 올바르지 않습니다."}, HTTP_400_BAD_REQUEST)
+
             token = TokenObtainPairSerializer.get_token(user)
             access_token = str(token.access_token)
             data = {
