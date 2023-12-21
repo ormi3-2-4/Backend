@@ -1,12 +1,19 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import CommunityView, CommunityCommentView
+from community.views import CommunityCommentView, CommunityView
 
-router = DefaultRouter()
-router.register(r'community', CommunityView, basename='community')
-router.register(r'community/(?P<community_pk>\d+)/comments/', CommunityCommentView, basename='community-comment')
+community_router = DefaultRouter()
+community_router.register("", CommunityView, basename="community")
+
+community_comment_router = DefaultRouter()
+community_comment_router.register(
+    "",
+    CommunityCommentView,
+    basename="community-comment",
+)
 
 
 urlpatterns = [
-    path('api/', include(router.urls)),
+    path("", include(community_router.urls)),
+    path("comment/", include(community_comment_router.urls)),
 ]
