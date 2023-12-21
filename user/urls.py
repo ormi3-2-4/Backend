@@ -5,7 +5,6 @@ from user.views import (
     UserRegisterView,
     UserDetailView,
     ChangePasswordView,
-    UserUpdateView,
 )
 
 urlpatterns = [
@@ -17,5 +16,4 @@ urlpatterns = [
         ChangePasswordView.as_view(),
         name="change_password",
     ),
-    path("profile/update/", UserUpdateView.as_view(), name="profile_update"),
 ]

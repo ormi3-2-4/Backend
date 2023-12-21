@@ -60,22 +60,9 @@ class UserLoginSerializer(serializers.ModelSerializer):
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
-    profile_image = serializers.ImageField(allow_null=True, required=False)
+    profile_image = serializers.FileField(allow_null=True, required=False)
+    nickname = serializers.CharField(required=False)
 
     class Meta:
         model = User
-        fields = ["username", "nickname", "profile_image"]
-        extra_kwargs = {"username": {"required": True}}
-
-    def update(self, instance, validated_data):
-        instance.username = validated_data.get("username", instance.username)
-        instance.nickname = validated_data.get("nickname", instance.nickname)
-        profile_image = validated_data.get("profile_image", None)
-
-        if profile_image and instance.profile_image != profile_image:
-            instance.profile_image.delete(save=False)
-            instance.profile_image = profile_image
-
-        instance.save()
-
-        return instance
+        fields = ["nickname", "profile_image"]

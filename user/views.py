@@ -1,7 +1,6 @@
-from django.contrib.auth import get_user_model
 from django.http import HttpRequest
 from rest_framework import permissions
-from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
@@ -11,14 +10,13 @@ from rest_framework.status import (
 )
 from rest_framework.views import APIView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from user.models import User
 from user.serializers import (
     UserLoginSerializer,
     UserSerializer,
     ChangePasswordSerializer,
     UserUpdateSerializer,
 )
-
-User = get_user_model()
 
 
 class UserLoginView(APIView):
@@ -51,6 +49,8 @@ class UserLoginView(APIView):
 
 
 class UserDetailView(APIView):
+    http_method_names = ["get", "put"]
+    parser_classes = [MultiPartParser]
     queryset = User.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
@@ -61,6 +61,19 @@ class UserDetailView(APIView):
     def get(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
+
+    def put(self, request: HttpRequest):
+        serializer = UserUpdateSerializer(data=request.data)
+        if serializer.is_valid():
+            user = User.objects.get(id=self.request.user.id)
+            user.nickname = serializer.validated_data.get("nickname", user.nickname)
+            user.profile_image.delete()
+            user.profile_image = serializer.validated_data.get(
+                "profile_image", user.profile_image
+            )
+            user.save()
+            return Response(UserSerializer(user).data, status=HTTP_200_OK)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
 class ChangePasswordView(APIView):
@@ -95,13 +108,3 @@ class UserRegisterView(APIView):
             }
             return Response(data, HTTP_201_CREATED)
         return Response(serializer.errors, HTTP_400_BAD_REQUEST)
-
-
-class UserUpdateView(RetrieveUpdateAPIView):
-    permission_classes = [
-        permissions.IsAuthenticated,
-    ]
-    serializer_class = UserUpdateSerializer
-
-    def get_object(self):
-        return self.request.user
