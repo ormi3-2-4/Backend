@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.http import HttpRequest
-from rest_framework import permissions, generics
+from rest_framework import permissions
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.response import Response
 from rest_framework.status import (
@@ -46,9 +46,17 @@ class UserLoginView(APIView):
         return Response(serializer.errors, HTTP_400_BAD_REQUEST)
 
 
-class UserDetailView(generics.RetrieveAPIView):
+class UserDetailView(APIView):
     queryset = User.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
+
+    def get_queryset(self):
+        return super().get_queryset().filter(id=self.request.user.id)
+
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
 
 
 class ChangePasswordView(APIView):
