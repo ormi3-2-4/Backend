@@ -14,6 +14,7 @@ from record.models import Record, RecordImage
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from record.permissions import UserPermission
 from django.views.generic.detail import DetailView
+from datetime import datetime
 
 
 @extend_schema_view(
@@ -57,7 +58,7 @@ class RecordViewSet(ModelViewSet):
         serializer = RecoredCreateSerializer(data=request.data)
         if serializer.is_valid():
             record = Record.objects.create(
-                **serializer.validated_data, user=self.request.user
+                **serializer.validated_data, user=self.request.user, start_at=datetime.now()
             )
             return Response(
                 RecordSerializer(record).data, status=status.HTTP_201_CREATED
@@ -70,8 +71,24 @@ class RecordViewSet(ModelViewSet):
         responses={200: RecordSerializer},
     )
     @action(detail=False, methods=["PATCH"], url_path="(?P<pk>[0-9]+)/finish")
-    def finish(self, *args, **kwargs):
-        return self.partial_update(*args, **kwargs)
+    def finish(self, request, *args, **kwargs):
+        try:
+            update_coords = json.loads(request.data["coords"])
+        except:
+            return Response("좌표를 입력해주세요.", status.HTTP_400_BAD_REQUEST)
+                    
+        try:
+            line = LineString(update_coords, srid=4326)
+            coords = {}
+            coords["type"] = "LineString"
+            coords["coordinates"] = update_coords
+            request.data["coords"] = coords
+        except:
+            return Response("좌표를 입력해주세요2.", status.HTTP_400_BAD_REQUEST)
+        request.data["distance"] = round(line.length * 1000, 2)  # kilometer
+        request.data["end_at"] = datetime.now()
+        
+        return self.partial_update(request, *args, **kwargs)
 
     @extend_schema(
         description="운동 중인 유저의 운동 거리 계산",
@@ -84,7 +101,7 @@ class RecordViewSet(ModelViewSet):
             update_coords = json.loads(request.data["coords"])
         except TypeError:
             return Response("좌표를 입력해주세요.", status.HTTP_400_BAD_REQUEST)
-
+        
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         record = serializer.data
@@ -103,7 +120,8 @@ class RecordViewSet(ModelViewSet):
         except:
             return Response("좌표를 입력해주세요2.", status.HTTP_400_BAD_REQUEST)
         request.data["distance"] = round(line.length * 1000, 2)  # kilometer
-
+        request.data["end_at"] = datetime.now()
+        
         return self.partial_update(request, *args, **kwargs)
 
     @extend_schema(

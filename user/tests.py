@@ -26,8 +26,8 @@ class UserTest(TestCase):
             print(response.data)
         self.assertEqual(response.status_code, 201)
         print("---------register-----response.data---------", response.data)
-        self.token = response.data["data"]["token"]
-        self.user_id = response.data["data"]["user"]["id"]
+        self.token = response.data["token"]
+        self.user_id = response.data["user"]["id"]
         self.headers = {}
         self.headers["Authorization"] = "Bearer " + self.token["access_token"]
         

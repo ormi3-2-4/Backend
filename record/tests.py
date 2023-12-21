@@ -119,8 +119,9 @@ class RecordTest(UserTest):
         print("---------response.data---------")
         print(response.data)
         self.assertEqual(response.status_code, 200)
+        coords = response.data["coords"]["coordinates"]
         self.record = response.data
-        coords = json.loads(response.data["coords"]["coordinates"])
+        self.record["coords"] = json.dumps(coords)
         print("---------coords---------")
         for (lat, lng) in coords:
             print(lat, lng)
@@ -136,8 +137,7 @@ class RecordTest(UserTest):
         self.headers["Content-Type"] = "application/json"
         
         self.record["start_at"] = "2021-07-01T00:00:20"
-        self.record["end_at"] = "2021-07-01T00:30:20"
-        
+                
         self.test_calculate()
         response = self.client.patch(self.base_url + "/record/" + str(self.record["id"]) + "/finish/", headers=self.headers, data=json.dumps(self.record))
         print("---------response.status_code---------")
