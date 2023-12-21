@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 from typing import Any
 from django.contrib.auth.models import AnonymousUser
@@ -58,7 +59,9 @@ class RecordViewSet(ModelViewSet):
         serializer = RecoredCreateSerializer(data=request.data)
         if serializer.is_valid():
             record = Record.objects.create(
-                **serializer.validated_data, user=self.request.user, start_at=datetime.now()
+                **serializer.validated_data,
+                user=self.request.user,
+                start_at=datetime.now()
             )
             return Response(
                 RecordSerializer(record).data, status=status.HTTP_201_CREATED

@@ -15,6 +15,7 @@ urlpatterns = [
     path("user/", include("user.urls")),
     path("record/", include("record.urls")),
     path("course/", include("course.urls")),
+    path("community/", include("community.urls")),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),

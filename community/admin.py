@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Community, CommunityComment
+from community.models import Community, CommunityComment
 
 
 # admin.site.register(Community)
@@ -12,8 +12,17 @@ from .models import Community, CommunityComment
 class CommunityAdmin(admin.ModelAdmin):
     list_display = ["id", "title", "user", "created_at"]
     list_filter = ["title", "user"]
-    fields = ["id", "title", "user", "content", "created_at"]
-    readonly_fields = ["id", "view_count", "likes", "created_at", "updated_at"]
+    fields = [
+        "id",
+        "user",
+        "title",
+        "content",
+        "record",
+        "created_at",
+        "view_count",
+        "likes",
+    ]
+    readonly_fields = ["id", "created_at", "updated_at"]
     search_fields = ["title", "content"]
     ordering = ["-created_at"]
 
@@ -25,4 +34,3 @@ class CommunityCommentAdmin(admin.ModelAdmin):
     fields = ["id", "content", "community", "user", "parent_comment", "created_at"]
     readonly_fields = ["parent_comment", "id", "created_at", "updated_at"]
     search_fields = ["user", "content"]
-
