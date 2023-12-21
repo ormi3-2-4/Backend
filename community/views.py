@@ -92,16 +92,26 @@ class CommunityView(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def like(self, request, pk=None):
-        # 커뮤니티 게시글에 좋아요 추가, 이미 좋아요를 한 사용자일 경우 좋아요 취소
+        # 커뮤니티 게시글에 좋아요 추가 또는 취소
         community = self.get_object()
         user = request.user
+
         if user.is_authenticated:
-            if community.likes.filter(id=user.id).exists():
+            # user_liked 필드를 통해 좋아요 여부 판단
+            serializer = self.get_serializer(community)
+            liked = serializer.data.get('user_liked', False)
+
+            if liked:
+                # 이미 좋아요를 한 경우, 좋아요 취소
                 community.likes.remove(user)
-                liked = False
             else:
+                # 좋아요를 하지 않은 경우, 좋아요 추가
                 community.likes.add(user)
-                liked = True
+
+            # user_liked 필드를 업데이트
+            serializer = self.get_serializer(community)
+            liked = serializer.data.get('user_liked', False)
+
             return Response({'liked': liked})
         else:
             return Response({'detail': '인증되지 않은 사용자입니다.'}, status=status.HTTP_401_UNAUTHORIZED)
