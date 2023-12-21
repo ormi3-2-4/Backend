@@ -19,8 +19,8 @@ class Record(models.Model):
         BICYCLE = "BICYCLE", "자전거"
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    start_at = models.DateTimeField(auto_now_add=True)
-    end_at = models.DateTimeField(auto_now=True)
+    start_at = models.DateTimeField(auto_now_add=True, help_text="시작 시점", null=True)
+    end_at = models.DateTimeField(auto_now=True, help_text="끝난 시점", null=True)
     static_map = models.ImageField(
         upload_to="record/static_map/%Y/%m/%d/", blank=True, null=True
     )

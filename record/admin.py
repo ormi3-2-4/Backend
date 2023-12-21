@@ -3,6 +3,7 @@ from django.contrib import admin
 from record.models import Record, RecordImage
 from leaflet.admin import LeafletGeoAdmin
 
+
 # Register your models here.
 @admin.register(Record)
 class RecordAdmin(LeafletGeoAdmin):
@@ -17,7 +18,7 @@ class RecordAdmin(LeafletGeoAdmin):
         "distance",
         "kind",
     ]
-    readonly_fields = ["created_at"]
+    readonly_fields = ["start_at", "end_at", "static_map", "created_at"]
     search_fields = ["user"]
     ordering = ["-created_at"]
 
