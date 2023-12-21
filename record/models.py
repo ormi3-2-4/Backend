@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from djgeojson.fields import LineStringField
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -19,14 +20,10 @@ class Record(models.Model):
         BICYCLE = "BICYCLE", "자전거"
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    start_at = models.DateTimeField(auto_now_add=True)
-    end_at = models.DateTimeField(auto_now=True)
-    static_map = models.ImageField(
-        upload_to="record/static_map/%Y/%m/%d/", blank=True, null=True
-    )
+    start_at = models.DateTimeField(blank=True, null=True, default=timezone.now)
+    end_at = models.DateTimeField(blank=True, null=True)
     coords = LineStringField(help_text="GPS데이터", blank=True, null=True)
     distance = models.FloatField(help_text="운동한 거리", blank=True, null=True)
-    speed = models.FloatField(help_text="평균 속도", blank=True, null=True, default=0.0)
     created_at = models.DateTimeField(auto_now_add=True)
     kind = models.CharField(
         choices=Kind, max_length=10, default=Kind.RUN, help_text="운동 종류"

@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from rest_framework import serializers
+from rest_framework import serializers, fields
 
 from record.models import Record, RecordImage
 
@@ -16,7 +16,7 @@ class RecordSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField()
     calorie = serializers.SerializerMethodField()
     speed = serializers.SerializerMethodField()
-
+    end_at = fields.DateTimeField(input_formats=['%Y-%m-%dT%H:%M:%S.%fZ'])
     class Meta:
         model = Record
         fields = [
@@ -24,7 +24,6 @@ class RecordSerializer(serializers.ModelSerializer):
             "user",
             "start_at",
             "end_at",
-            "static_map",
             "coords",
             "distance",
             "speed",
@@ -40,7 +39,6 @@ class RecordSerializer(serializers.ModelSerializer):
             "created_at",
             "start_at",
             "end_at",
-            "static_map",
         ]
 
     def get_time(self, obj: Record):
@@ -66,7 +64,11 @@ class RecordSerializer(serializers.ModelSerializer):
         if obj.distance is None:
             return 0
 
-        return obj.distance / sec * 60 * 60
+        try:
+            return obj.distance / sec * 60 * 60
+        except ZeroDivisionError:
+            return 0
+        
 
     def get_calorie(self, obj: Record):
         if obj.start_at is None or obj.end_at is None:
@@ -75,3 +77,4 @@ class RecordSerializer(serializers.ModelSerializer):
         if obj.distance is None:
             return 0
         return obj.distance * 60
+    

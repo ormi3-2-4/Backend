@@ -12,7 +12,6 @@ class RecordAdmin(LeafletGeoAdmin):
         "user",
         "start_at",
         "end_at",
-        "static_map",
         "coords",
         "distance",
         "kind",
