@@ -23,7 +23,7 @@ class CommunityCommentSerializer(serializers.ModelSerializer):
 class CommunitySerializer(serializers.ModelSerializer):
     user_username = serializers.SerializerMethodField()
     comments = CommunityCommentSerializer(many=True, read_only=True)
-    user_liked = serializers.SerializerMethodField()
+    user_liked = serializers.SerializerMethodField(default=False)
     likes_count = serializers.IntegerField(source='likes.count', read_only=True)
 
     class Meta:
