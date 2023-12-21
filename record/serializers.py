@@ -4,12 +4,19 @@ from rest_framework import serializers
 
 from record.models import Record, RecordImage
 
+
+class RecoredCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Record
+        fields = ["kind"]
+
+
 class RecordSerializer(serializers.ModelSerializer):
     time = serializers.SerializerMethodField()
     images = serializers.SerializerMethodField()
     calorie = serializers.SerializerMethodField()
     speed = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Record
         fields = [
@@ -25,7 +32,7 @@ class RecordSerializer(serializers.ModelSerializer):
             "created_at",
             "kind",
             "images",
-            "calorie"
+            "calorie",
         ]
         read_only_fields = [
             "id",
@@ -52,20 +59,19 @@ class RecordSerializer(serializers.ModelSerializer):
 
     def get_speed(self, obj: Record):
         if obj.start_at is None or obj.end_at is None:
-            return None
+            return 0
         time_diff: timedelta = obj.end_at - obj.start_at
         sec = time_diff.seconds
-        
-        try:
-            return obj.distance / sec*60*60
-        except:
-            return None
-    
+
+        if obj.distance is None:
+            return 0
+
+        return obj.distance / sec * 60 * 60
+
     def get_calorie(self, obj: Record):
         if obj.start_at is None or obj.end_at is None:
-            return None
+            return 0
         # 60kg 체중 기준 칼로리 계산.
-        try:
-            return obj.distance * 60
-        except:
-            return None
+        if obj.distance is None:
+            return 0
+        return obj.distance * 60

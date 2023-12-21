@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
-from django.http import Http404, HttpRequest
+from django.http import HttpRequest
 from rest_framework import permissions, generics
-from rest_framework.generics import get_object_or_404, RetrieveUpdateAPIView
+from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
