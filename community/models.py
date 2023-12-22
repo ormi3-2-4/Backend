@@ -1,17 +1,17 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from record.models import Record
+
 User = get_user_model()
 
 
-class Recommend(models.Model):
-    class Category(models.TextChoices):
-        SHOES = "SHOES", "운동화"
-        CLOTHES = "CLOTHES", "운동복"
-        BICYCLE = "BICYCLE", "자전거"
-
+class Community(models.Model):
+    record = models.ForeignKey(
+      to=Record, on_delete=models.CASCADE, null=True, help_text="운동기록"
+    )
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="recommend", help_text="작성자"
+        User, on_delete=models.CASCADE, related_name="community", help_text="작성자"
     )
     title = models.CharField(max_length=100, help_text="제목")
     content = models.TextField(help_text="내용")
@@ -19,30 +19,24 @@ class Recommend(models.Model):
     updated_at = models.DateTimeField(auto_now=True, help_text="업데이트 날짜 및 시간")
     view_count = models.PositiveIntegerField(default=0, help_text="조회수")
     likes = models.ManyToManyField(
-        User, related_name="recommend_likes", help_text="좋아요"
-    )
-    image = models.ImageField(
-        upload_to="recommend/images/%Y/%m/%d/", blank=True, help_text="이미지"
-    )
-    category = models.CharField(
-        choices=Category.choices, max_length=10, help_text="용품 종류"
+        User, related_name="community_likes", help_text="좋아요"
     )
 
     def __str__(self):
         return f"{self.title}: {self.user}: {self.created_at}"
 
     class Meta:
-        db_table = "recommend"
+        db_table = "community"
         verbose_name = "게시글"
-        verbose_name_plural = "Recommend 게시판"
+        verbose_name_plural = "Community"
 
 
-class RecommendComment(models.Model):
-    recommend = models.ForeignKey(
-        Recommend,
+class CommunityComment(models.Model):
+    community = models.ForeignKey(
+        Community,
         on_delete=models.CASCADE,
         related_name="comments",
-        help_text="추천게시글 댓글",
+        help_text="운동게시글 댓글",
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE, help_text="작성자")
     content = models.TextField(help_text="내용")
@@ -56,6 +50,7 @@ class RecommendComment(models.Model):
         return f"{self.content}: {self.user}: {self.created_at}"
 
     class Meta:
-        db_table = "recommend_comments"
+        db_table = "community_comments"
         verbose_name = "댓글"
-        verbose_name_plural = "Recommend 댓글"
+        verbose_name_plural = "Community 댓글"
+

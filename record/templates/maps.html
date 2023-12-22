@@ -1,0 +1,13 @@
+{% load leaflet_tags %}
+<html>
+    <head>
+    {% leaflet_js plugins="forms"  %}
+    {% leaflet_css plugins="forms"  %}
+    <style>
+        .leaflet-container { height: 100%; }
+    </style>
+    </head>
+    <body>
+        {{form.as_p}}
+    </body>
+</html>

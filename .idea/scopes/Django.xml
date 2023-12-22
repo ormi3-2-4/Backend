@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Django" pattern="file[Backend]:*/&amp;&amp;!file[Backend]:.venv//*" />
+</component>
