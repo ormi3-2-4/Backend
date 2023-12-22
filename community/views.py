@@ -111,20 +111,17 @@ class CommunityView(viewsets.ModelViewSet):
         user = request.user
 
         if user.is_authenticated:
-            # user_liked 필드를 통해 좋아요 여부 판단
-            serializer = self.get_serializer(community)
-            liked = serializer.data.get("user_liked", False)
+            # 현재 사용자가 해당 커뮤니티에 대한 좋아요 여부 확인
+            liked = community.likes.filter(id=user.id).exists()
 
             if liked:
                 # 이미 좋아요를 한 경우, 좋아요 취소
                 community.likes.remove(user)
+                liked = False
             else:
                 # 좋아요를 하지 않은 경우, 좋아요 추가
                 community.likes.add(user)
-
-            # user_liked 필드를 업데이트
-            serializer = self.get_serializer(community)
-            liked = serializer.data.get("user_liked", False)
+                liked = True
 
             return Response({"liked": liked})
         else:
