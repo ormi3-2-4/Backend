@@ -136,3 +136,60 @@ class RecommendView(viewsets.ModelViewSet):
         instance.save()
         serializer = RecommendSerializer(instance)
         return Response(serializer.data)
+
+
+@extend_schema_view(
+    list=extend_schema(
+        description="특정 게시글에 대한 댓글 목록",
+        responses={200: RecommendCommentSerializer(many=True)},
+    ),
+    create=extend_schema(
+        description="댓글 작성 (인증 필요)",
+        request=RecommendCommentSerializer(),
+        responses={201: RecommendCommentSerializer()},
+    ),
+    update=extend_schema(
+        description="댓글 수정 (작성자만 가능)",
+        request=RecommendCommentSerializer(),
+        responses={200: RecommendCommentSerializer()},
+    ),
+    destroy=extend_schema(
+        description="댓글 삭제 (작성자만 가능)",
+        responses={204: "No Content"},
+    ),
+)
+class RecommendCommentView(viewsets.ModelViewSet):
+    queryset = RecommendComment.objects.all()
+    serializer_class = RecommendCommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def list(self, request, *args, **kwargs):
+        # 게시글에 연결된 댓글 가져오기
+        recommend = get_object_or_404(Recommend, pk=self.kwargs["pk"])
+        comments = self.queryset.filter(recommend=recommend)
+        serializer = self.get_serializer(comments, many=True)
+        return Response(serializer.data)
+
+    def perform_create(self, serializer):
+        # 새로운 커뮤니티 댓글이 생성될 때, 해당 댓글의 작성자를 현재 요청을 보낸 사용자로 설정
+        serializer.save(user=self.request.user)
+
+    def update(self, request, *args, **kwargs):
+        # 댓글 수정은 작성자만 가능
+        comment = self.get_object()
+        if comment.user == request.user:
+            return super().update(request, *args, **kwargs)
+        else:
+            return Response(
+                {"detail": "댓글 수정 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN
+            )
+
+    def destroy(self, request, *args, **kwargs):
+        # 댓글 삭제는 작성자만 가능
+        comment = self.get_object()
+        if comment.user == request.user:
+            return super().destroy(request, *args, **kwargs)
+        else:
+            return Response(
+                {"detail": "댓글 삭제 권한이 없습니다."}, status=status.HTTP_403_FORBIDDEN
+            )
