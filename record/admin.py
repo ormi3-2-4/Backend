@@ -17,7 +17,7 @@ class RecordAdmin(LeafletGeoAdmin):
         "distance",
         "kind",
     ]
-    readonly_fields = ["start_at", "end_at", "static_map", "created_at"]
+    readonly_fields = ["start_at", "end_at", "created_at"]
     search_fields = ["user"]
     ordering = ["-created_at"]
 
