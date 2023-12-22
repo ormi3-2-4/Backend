@@ -19,6 +19,7 @@ from user.serializers import (
     UserUpdateSerializer,
 )
 
+
 class UserLoginView(APIView):
     permission_classes = [permissions.AllowAny]
     http_method_names = ["post"]
@@ -74,12 +75,22 @@ class UserDetailView(APIView):
 
     @extend_schema(
         description="유저의 정보를 수정합니다.",
-        request=UserUpdateSerializer,
+        request={
+            "multipart/form-data": {
+                "type": "object",
+                "properties": {
+                    "profile_image": {"type": "string", "format": "binary"},
+                    "nickname": {"type": "string"},
+                },
+            }
+        },
         responses={200: UserSerializer},
     )
     def put(self, request: HttpRequest):
         serializer = UserUpdateSerializer(data=request.data)
+
         if serializer.is_valid():
+            print(serializer.validated_data)
             user = User.objects.get(id=self.request.user.id)
             user.nickname = serializer.validated_data.get("nickname", user.nickname)
             user.profile_image.delete()
