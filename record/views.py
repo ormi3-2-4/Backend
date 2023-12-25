@@ -77,9 +77,10 @@ class RecordViewSet(ModelViewSet):
     def finish(self, request, *args, **kwargs):
         try:
             update_coords = json.loads(request.data["coords"])
+
         except:
             return Response("좌표를 입력해주세요.", status.HTTP_400_BAD_REQUEST)
-                    
+
         try:
             line = LineString(update_coords, srid=4326)
             coords = {}
@@ -90,7 +91,7 @@ class RecordViewSet(ModelViewSet):
             return Response("좌표를 입력해주세요2.", status.HTTP_400_BAD_REQUEST)
         request.data["distance"] = round(line.length * 1000, 2)  # kilometer
         request.data["end_at"] = datetime.now()
-        
+
         return self.partial_update(request, *args, **kwargs)
 
     @extend_schema(
@@ -104,7 +105,7 @@ class RecordViewSet(ModelViewSet):
             update_coords = json.loads(request.data["coords"])
         except TypeError:
             return Response("좌표를 입력해주세요.", status.HTTP_400_BAD_REQUEST)
-        
+
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         record = serializer.data
@@ -124,7 +125,7 @@ class RecordViewSet(ModelViewSet):
             return Response("좌표를 입력해주세요2.", status.HTTP_400_BAD_REQUEST)
         request.data["distance"] = round(line.length * 1000, 2)  # kilometer
         request.data["end_at"] = datetime.now()
-        
+
         return self.partial_update(request, *args, **kwargs)
 
     @extend_schema(
