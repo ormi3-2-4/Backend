@@ -23,6 +23,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: 환경 벼수 설정
         run: |
+          touch .env
           echo ${{secrets.BUCKET_NAME}} >> .env
           echo ${{secrets.DB_REMOTE_HOST}} >> .env
           echo ${{secrets.DB_REMOTE_PW}} >> .env
