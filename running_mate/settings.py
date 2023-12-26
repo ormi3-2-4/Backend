@@ -90,8 +90,8 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3" if DEBUG else "django.db.backends.mysql",
         "NAME": getenv("DB_NAME"),
-        "USER": getenv("DB_REMOTE_USERNAME") if not DEBUG else None,
-        "PASSWORD": getenv("DB_REMOTE_PW") if DEBUG else None,
+        "USER": getenv("DB_REMOTE_USERNAME") if not DEBUG else "",
+        "PASSWORD": getenv("DB_REMOTE_PW") if DEBUG else "",
         "HOST": getenv("DB_REMOTE_HOST") if not DEBUG else "localhost",
         "PORT": getenv("DB_PORT"),
     }
