@@ -38,6 +38,11 @@ jobs:
           pip install -r requirements.txt
           sudo apt-get install binutils libproj-dev gdal-bin
 
+      - name: DB 작성
+        run: |
+          python manage.py makemigrations
+          python manage.py migrate
+
       - name: 테스트
         run: |
           python manage.py test
