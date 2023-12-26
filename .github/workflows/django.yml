@@ -61,10 +61,22 @@ jobs:
           password: ${{env.DB_REMOTE_PW}}
           script: |
             set -e
+
+            # 이동
             cd Backend/
+
+            # Git Update
             git pull
+
+            # 모듈 설치
             pip install -r requirements.txt
+
+            # DB 마이그레이션
             python manage.py makemigrations
             python manage.py migrate
+
+            # 정적 파일 수집
             python manage.py collectstatic --noinput
+
+            # 배포
             gunicorn running_mate.wsgi:application -b 0.0.0.0:8000
