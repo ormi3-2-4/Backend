@@ -42,17 +42,19 @@ INSTALLED_APPS = [
     "storages",
     "dj_rest_auth",
     "allauth",
+    "corsheaders",
+    "djgeojson",
+    "leaflet",
     # local
     "record",
     "course",
     "community",
     "recommend",
     "user",
-    "djgeojson",
-    "leaflet",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -170,7 +172,7 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-    "PAGE_SIZE": 10,
+    "PAGE_SIZE": 5,
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
 }
 
@@ -198,3 +200,8 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 # leaflet
 LEAFLET_CONFIG = {"DEFAULT_ZOOM": 10}
+
+# cors
+CORS_ALLOWED_ORIGINS = [
+    getenv("CORS_ALLOWED_ORIGIN"),
+]

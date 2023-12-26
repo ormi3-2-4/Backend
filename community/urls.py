@@ -14,6 +14,6 @@ community_comment_router.register(
 
 
 urlpatterns = [
-    path("", include(community_router.urls)),
     path("comment/", include(community_comment_router.urls)),
+    path("", include(community_router.urls)),
 ]
