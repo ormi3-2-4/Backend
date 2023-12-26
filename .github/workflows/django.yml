@@ -32,6 +32,15 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: MySQL 설치 및 실행
+        uses: mirromutth/mysql-action@v1.1
+        with:
+          mysql version: '8.0'
+          mysql database: ${{env.DB_NAME}}
+          mysql root password: ${{env.DB_REMOTE_PW}}
+          character set server: 'utf8mb4'
+          collation server: 'utf8mb4_general_ci'
+
       - name: 모듈 설치
         run: |
           python -m pip install --upgrade pip
@@ -41,8 +50,4 @@ jobs:
       - name: DB 작성
         run: |
           python manage.py makemigrations
-          # python manage.py migrate
-
-      # - name: 테스트
-      #   run: |
-      #     python manage.py test
+          python manage.py migrate

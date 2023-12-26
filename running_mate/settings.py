@@ -88,10 +88,10 @@ ASGI_APPLICATION = "running_mate.asgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3" if DEBUG else "django.db.backends.mysql",
-        "NAME": "db.sqlite3" if DEBUG else getenv("DB_NAME"),
-        "USER": "" if DEBUG else getenv("DB_REMOTE_USERNAME"),
-        "PASSWORD": "" if DEBUG else getenv("DB_REMOTE_PW"),
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": getenv("DB_NAME"),
+        "USER": "root" if DEBUG else getenv("DB_REMOTE_USERNAME"),
+        "PASSWORD": getenv("DB_REMOTE_PW"),
         "HOST": "localhost" if DEBUG else getenv("DB_REMOTE_HOST"),
         "PORT": getenv("DB_PORT"),
     }
