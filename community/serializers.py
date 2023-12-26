@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from community.models import Community, CommunityComment
+from record.models import Record
 from record.serializers import RecordSerializer
 from user.serializers import UserSerializer
 
@@ -61,6 +62,11 @@ class CommunityPreviewSerializer(serializers.ModelSerializer):
 
     def get_comments(self, obj):
         return CommunityComment.objects.filter(community=obj).count()
+    
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['record'] = RecordSerializer(instance.record).data
+        return data
 
 
 class CommunitySerializer(serializers.ModelSerializer):

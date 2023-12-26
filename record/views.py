@@ -1,22 +1,24 @@
 from datetime import datetime
 import json
 from typing import Any
+
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.gis.geos import LineString
 from django.http import Http404, HttpRequest
+from django.views.generic.detail import DetailView
+
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+from drf_spectacular.utils import extend_schema, extend_schema_view
+
+from record.permissions import UserPermission
 from record.forms import LeafletForm
 from record.serializers import RecordSerializer, RecoredCreateSerializer
 from record.models import Record, RecordImage
-from drf_spectacular.utils import extend_schema, extend_schema_view
-from record.permissions import UserPermission
-from django.views.generic.detail import DetailView
-from datetime import datetime
-
 
 @extend_schema_view(
     list=extend_schema(  # GET record/
@@ -51,7 +53,7 @@ class RecordViewSet(ModelViewSet):
     permission_classes = [UserPermission]
     queryset = Record.objects.all()
     serializer_class = RecordSerializer
-
+    
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
 
@@ -168,3 +170,5 @@ class LeafletView(DetailView):
             ),
         }
         return context
+
+maps = xframe_options_exempt(LeafletView.as_view())
