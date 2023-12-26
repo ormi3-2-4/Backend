@@ -41,7 +41,7 @@ jobs:
       - name: DB 작성
         run: |
           python manage.py makemigrations
-          python manage.py migrate
+          # python manage.py migrate
 
       - name: 테스트
         run: |
