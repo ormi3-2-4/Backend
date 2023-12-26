@@ -20,6 +20,7 @@ jobs:
       DEBUG: ${{secrets.DEBUG}}
       S3_ACCESS_KEY: ${{secrets.S3_ACCESS_KEY}}
       S3_SECRET_ACCESS_KEY: ${{secrets.S3_SECRET_ACCESS_KEY}}
+      DB_NAME: ${{secrets.DB_NAME}}
       DB_REMOTE_HOST: ${{secrets.DB_REMOTE_HOST}}
       DB_REMOTE_PW: ${{secrets.DB_REMOTE_PW}}
       DB_REMOTE_USERNAME: ${{secrets.DB_REMOTE_USERNAME}}
