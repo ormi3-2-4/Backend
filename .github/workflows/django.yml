@@ -24,6 +24,7 @@ jobs:
       DB_REMOTE_PW: ${{secrets.DB_REMOTE_PW}}
       DB_REMOTE_USERNAME: ${{secrets.DB_REMOTE_USERNAME}}
       BUCKET_NAME: ${{secrets.BUCKET_NAME}}
+      CORS_ALLOWED_ORIGIN: ${{secrets.CORS_ALLOWED_ORIGIN}}
 
     steps:
       - uses: actions/checkout@v3
