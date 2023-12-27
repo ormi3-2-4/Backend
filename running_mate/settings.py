@@ -93,7 +93,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.mysql",
         "NAME": getenv("DB_NAME"),
         "USER": "root" if DEBUG else getenv("DB_REMOTE_USERNAME"),
-        "PASSWORD": getenv("DB_REMOTE_PW"),
+        "PASSWORD": getenv("DB_PW") if DEBUG else getenv("DB_REMOTE_PW"),
         "HOST": "localhost" if DEBUG else getenv("DB_REMOTE_HOST"),
         "PORT": getenv("DB_PORT"),
     }
@@ -204,4 +204,5 @@ LEAFLET_CONFIG = {"DEFAULT_ZOOM": 10}
 # cors
 CORS_ALLOWED_ORIGINS = [
     getenv("CORS_ALLOWED_ORIGIN"),
+    # "http://localhost:*",
 ]
