@@ -12,10 +12,11 @@ from dj_rest_auth.views import PasswordResetConfirmView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("user/", include("user.urls")),
-    path("record/", include("record.urls")),
-    path("course/", include("course.urls")),
-    path("community/", include("community.urls")),
+    path("users/", include("user.urls")),
+    path("records/", include("record.urls")),
+    path("courses/", include("course.urls")),
+    path("communities/", include("community.urls")),
+    path("recommends/", include("recommend.urls")),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),

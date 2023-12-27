@@ -15,5 +15,5 @@ recommend_comment_router.register(
 
 urlpatterns = [
     path("", include(recommend_router.urls)),
-    path("comment/", include(recommend_comment_router.urls)),
+    path("comments/", include(recommend_comment_router.urls)),
 ]
