@@ -1,27 +1,27 @@
 # rest_framework
 from rest_framework import (
-    viewsets,  # ViewSet 클래스를 사용하기 위한 import
-    status,  # HTTP 상태 코드를 사용하기 위한 import
-    filters,  # 검색 및 필터링을 위한 import
+    viewsets,
+    status,
+    filters,
 )
-from rest_framework.decorators import action  # 액션 데코레이터 import
-from drf_spectacular.utils import extend_schema, extend_schema_view  # 스키마 import
-from rest_framework.response import Response  # API 응답을 생성하기 위한 import
+from rest_framework.decorators import action
+from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework.response import Response
 from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly,
-)  # 인증 권한을 사용하기 위한 import
-from rest_framework.pagination import PageNumberPagination  # 페이지네이션
+)
+from rest_framework.pagination import PageNumberPagination
 
 # Django
-from django.shortcuts import get_object_or_404  # 404 에러 시 객체를 가져오거나 404 에러 발생
-from django.db.models import Q  # Q 객체를 사용하기 위한 import
+from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 # app
 from recommend.models import (
     Recommend,
     RecommendComment,
-)  # Recommend, RecommendComment 모델 import
-from recommend.serializers import (  # Serializer 클래스 import
+)
+from recommend.serializers import (
     RecommendPreviewSerializer,
     RecommendSerializer,
     RecommendCommentSerializer,
@@ -58,6 +58,16 @@ from recommend.serializers import (  # Serializer 클래스 import
     ),
 )
 class RecommendView(viewsets.ModelViewSet):
+    """
+    운동용품 추천 글 생성(create), 수정(update), 삭제(destroy) 기능과
+    검색(get_queryset), 좋아요(like), 조회수(retrieve) 기능 포함.
+    
+    글 수정과 삭제는 작성자만 가능하며,
+    글 생성과 좋아요는 인증된 사용자만 가능.
+
+    page_size = 10
+    """
+    
     queryset = Recommend.objects.all()
     serializer_class = RecommendPreviewSerializer
     filter_backends = [filters.SearchFilter]
@@ -69,11 +79,9 @@ class RecommendView(viewsets.ModelViewSet):
     page_size = 10  # 10개씩 페이징
 
     def perform_create(self, serializer):
-        # 새로운 운동용품 추천 글이 생성될 때, 해당 추천 글의 작성자를 현재 요청을 보낸 사용자로 설정
         serializer.save(user=self.request.user)
 
     def update(self, request, *args, **kwargs):
-        # 글 수정은 작성자만 가능
         community = self.get_object()
         if community.user == request.user:
             return super().update(request, *args, **kwargs)
@@ -83,7 +91,6 @@ class RecommendView(viewsets.ModelViewSet):
             )
 
     def destroy(self, request, *args, **kwargs):
-        # 글 삭제는 작성자만 가능
         community = self.get_object()
         if community.user == request.user:
             return super().destroy(request, *args, **kwargs)
@@ -93,11 +100,14 @@ class RecommendView(viewsets.ModelViewSet):
             )
 
     def get_queryset(self):
-        # 검색어에 따라 필터링
+        """
+        검색어에 따라 필터링하며, 
+        Q 객체를 사용하여 제목 또는 내용에서 검색
+        """
+        
         queryset = Recommend.objects.all()
         search_keyword = self.request.query_params.get("search", None)
         if search_keyword:
-            # Q 객체를 사용하여 제목 또는 내용에서 검색
             queryset = queryset.filter(
                 Q(title__icontains=search_keyword)
                 | Q(content__icontains=search_keyword)
@@ -106,20 +116,20 @@ class RecommendView(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["post"])
     def like(self, request, pk=None):
-        # 운동용품 추천 글에 좋아요 추가 또는 취소
+        """
+        사용자의 해당 게시글에 대한 좋아요 여부 확인 후 좋아요 추가 또는 취소.
+        """
+        
         recommend = self.get_object()
         user = request.user
 
         if user.is_authenticated:
-            # 현재 사용자가 운동용품 추천 글에 대한 좋아요 여부 확인
             liked = recommend.likes.filter(id=user.id).exists()
 
             if liked:
-                # 이미 좋아요를 한 경우, 좋아요 취소
                 recommend.likes.remove(user)
                 liked = False
             else:
-                # 좋아요를 하지 않은 경우, 좋아요 추가
                 recommend.likes.add(user)
                 liked = True
 
@@ -131,7 +141,6 @@ class RecommendView(viewsets.ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        # 운동용품 추천 글 조회 시 조회수 증가
         instance.view_count += 1
         instance.save()
         serializer = RecommendSerializer(instance)
@@ -159,23 +168,27 @@ class RecommendView(viewsets.ModelViewSet):
     ),
 )
 class RecommendCommentView(viewsets.ModelViewSet):
+    """
+    댓글 생성(create), 수정(update), 삭제(destroy) 기능 포함.
+    
+    댓글 수정과 삭제는 작성자만 가능하며,
+    list 를 통해 게시글에 연결된 댓글을 가져옴.
+    """
+    
     queryset = RecommendComment.objects.all()
     serializer_class = RecommendCommentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def list(self, request, *args, **kwargs):
-        # 게시글에 연결된 댓글 가져오기
         recommend = get_object_or_404(Recommend, pk=self.kwargs["pk"])
         comments = self.queryset.filter(recommend=recommend)
         serializer = self.get_serializer(comments, many=True)
         return Response(serializer.data)
 
     def perform_create(self, serializer):
-        # 새로운 커뮤니티 댓글이 생성될 때, 해당 댓글의 작성자를 현재 요청을 보낸 사용자로 설정
         serializer.save(user=self.request.user)
 
     def update(self, request, *args, **kwargs):
-        # 댓글 수정은 작성자만 가능
         comment = self.get_object()
         if comment.user == request.user:
             return super().update(request, *args, **kwargs)
@@ -185,7 +198,6 @@ class RecommendCommentView(viewsets.ModelViewSet):
             )
 
     def destroy(self, request, *args, **kwargs):
-        # 댓글 삭제는 작성자만 가능
         comment = self.get_object()
         if comment.user == request.user:
             return super().destroy(request, *args, **kwargs)
