@@ -29,12 +29,6 @@ urlpatterns = [
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
     ),
-    path("dj-rest-auth/", include("dj_rest_auth.urls")),
-    path(
-        "dj-rest-auth/password/reset/confirm/<slug:uidb64>/<slug:token>/",
-        PasswordResetConfirmView.as_view(),
-        name="password_reset_confirm",
-    ),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
