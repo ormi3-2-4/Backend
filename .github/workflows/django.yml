@@ -53,43 +53,43 @@ jobs:
           pip install -r requirements.txt
           sudo apt-get install binutils libproj-dev gdal-bin
 
-      - name: 배포
-        uses: appleboy/ssh-action@master
-        continue-on-error: false
-        with:
-          host: ${{secrets.AWS_HOST}}
-          username: ${{secrets.AWS_USER}}
-          password: ${{secrets.AWS_PASSWORD}}
-          script: |
-            set -e
+    #   - name: 배포
+    #     uses: appleboy/ssh-action@master
+    #     continue-on-error: false
+    #     with:
+    #       host: ${{secrets.AWS_HOST}}
+    #       username: ${{secrets.AWS_USER}}
+    #       password: ${{secrets.AWS_PASSWORD}}
+    #       script: |
+    #         set -e
 
-            # 이동
-            cd Backend/
+    #         # 이동
+    #         cd Backend/
 
-            # Git Update
-            git pull origin main
+    #         # Git Update
+    #         git pull origin main
 
-            # .env 파일 생성
-            echo SECRET_KEY=${{ secrets.SECRET_KEY }} > .env
-            echo S3_ACCESS_KEY=${{secrets.S3_ACCESS_KEY}} >> .env
-            echo S3_SECRET_ACCESS_KEY=${{secrets.S3_SECRET_ACCESS_KEY}} >> .env
-            echo DB_NAME=${{secrets.DB_NAME}} >> .env
-            echo DB_PW=1234 >> .env
-            echo DB_REMOTE_HOST=${{secrets.DB_REMOTE_HOST}} >> .env
-            echo DB_REMOTE_PW=${{secrets.DB_REMOTE_PW}} >> .env
-            echo DB_REMOTE_USERNAME=${{secrets.DB_REMOTE_USERNAME}} >> .env
-            echo BUCKET_NAME=${{secrets.BUCKET_NAME}} >> .env
-            echo CORS_ALLOWED_ORIGIN=${{secrets.CORS_ALLOWED_ORIGIN}} >> .env
+    #         # .env 파일 생성
+    #         echo SECRET_KEY=${{ secrets.SECRET_KEY }} > .env
+    #         echo S3_ACCESS_KEY=${{secrets.S3_ACCESS_KEY}} >> .env
+    #         echo S3_SECRET_ACCESS_KEY=${{secrets.S3_SECRET_ACCESS_KEY}} >> .env
+    #         echo DB_NAME=${{secrets.DB_NAME}} >> .env
+    #         echo DB_PW=1234 >> .env
+    #         echo DB_REMOTE_HOST=${{secrets.DB_REMOTE_HOST}} >> .env
+    #         echo DB_REMOTE_PW=${{secrets.DB_REMOTE_PW}} >> .env
+    #         echo DB_REMOTE_USERNAME=${{secrets.DB_REMOTE_USERNAME}} >> .env
+    #         echo BUCKET_NAME=${{secrets.BUCKET_NAME}} >> .env
+    #         echo CORS_ALLOWED_ORIGIN=${{secrets.CORS_ALLOWED_ORIGIN}} >> .env
             
-            # 모듈 설치
-            pip install -r requirements.txt
+    #         # 모듈 설치
+    #         pip install -r requirements.txt
 
-            # DB 마이그레이션
-            python3 manage.py makemigrations
-            python3 manage.py migrate
+    #         # DB 마이그레이션
+    #         python3 manage.py makemigrations
+    #         python3 manage.py migrate
 
-            # 정적 파일 수집
-            python3 manage.py collectstatic --noinput
+    #         # 정적 파일 수집
+    #         python3 manage.py collectstatic --noinput
 
-            # 배포
-            gunicorn running_mate.wsgi:application -b 0.0.0.0:8000
+    #         # 배포
+    #         gunicorn running_mate.wsgi:application -b 0.0.0.0:8000
