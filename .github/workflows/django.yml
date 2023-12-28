@@ -91,5 +91,6 @@ jobs:
             # 정적 파일 수집
             python3 manage.py collectstatic --noinput
 
-            # 배포
-            gunicorn running_mate.wsgi:application -b 0.0.0.0:8000
+            # gunicorn 재실행
+            sudo systemctl restart gunicorn.service
+            
