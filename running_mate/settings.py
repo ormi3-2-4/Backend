@@ -94,6 +94,9 @@ DATABASES = {
         "PASSWORD": getenv("DB_PW") if DEBUG else getenv("DB_REMOTE_PW"),
         "HOST": "localhost" if DEBUG else getenv("DB_REMOTE_HOST"),
         "PORT": getenv("DB_PORT"),
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+        },
     }
 }
 
