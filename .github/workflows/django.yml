@@ -54,31 +54,31 @@ jobs:
           python manage.py makemigrations
           python manage.py migrate
 
-      # - name: 배포
-      #   uses: appleboy/ssh-action@master
-      #   continue-on-error: false
-      #   with:
-      #     host: ${{env.DB_REMOTE_HOST}}
-      #     username: ${{env.DB_REMOTE_USERNAME}}
-      #     password: ${{env.DB_REMOTE_PW}}
-      #     script: |
-      #       set -e
+      - name: 배포
+        uses: appleboy/ssh-action@master
+        continue-on-error: false
+        with:
+          host: ${{secrets.AWS_HOST}}
+          username: ${{secrets.AWS_USER}}
+          password: ${{secrets.AWS_PASSWORD}}
+          script: |
+            set -e
 
-      #       # 이동
-      #       cd Backend/
+            # 이동
+            cd Backend/
 
-      #       # Git Update
-      #       git pull
+            # Git Update
+            git pull
 
-      #       # 모듈 설치
-      #       pip install -r requirements.txt
+            # 모듈 설치
+            pip install -r requirements.txt
 
-      #       # DB 마이그레이션
-      #       python manage.py makemigrations
-      #       python manage.py migrate
+            # DB 마이그레이션
+            python manage.py makemigrations
+            python manage.py migrate
 
-      #       # 정적 파일 수집
-      #       python manage.py collectstatic --noinput
+            # 정적 파일 수집
+            python manage.py collectstatic --noinput
 
-      #       # 배포
-      #       gunicorn running_mate.wsgi:application -b 0.0.0.0:8000
+            # 배포
+            gunicorn running_mate.wsgi:application -b 0.0.0.0:8000
