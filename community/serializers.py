@@ -1,6 +1,8 @@
 from rest_framework import serializers
+
 from community.models import Community, CommunityComment
 from record.models import Record
+
 from record.serializers import RecordSerializer
 from user.serializers import UserSerializer
 
