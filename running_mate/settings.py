@@ -90,9 +90,9 @@ DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
         "NAME": getenv("DB_NAME"),
-        "USER": "root" if DEBUG else getenv("DB_REMOTE_USERNAME"),
-        "PASSWORD": getenv("DB_PW") if DEBUG else getenv("DB_REMOTE_PW"),
-        "HOST": "localhost" if DEBUG else getenv("DB_REMOTE_HOST"),
+        "USER": "root",
+        "PASSWORD": getenv("DB_PW"),
+        "HOST": "localhost",
         "PORT": getenv("DB_PORT"),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"

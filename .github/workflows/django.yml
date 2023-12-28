@@ -67,7 +67,7 @@ jobs:
             cd Backend/
 
             # Git Update
-            git pull origin main
+            git pull origin main --ff-only
 
             # .env 파일 생성
             echo SECRET_KEY=${{ secrets.SECRET_KEY }} > .env
