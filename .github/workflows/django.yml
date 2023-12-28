@@ -64,6 +64,7 @@ jobs:
           script: |
             set -e
 
+            source ~/.bashrc
             # 이동
             cd Backend/
 
