@@ -15,20 +15,10 @@ jobs:
       matrix:
         python-version: [3.10.6, 3.11, 3.12]
 
-    env:
-      SECRET_KEY: ${{secrets.SECRET_KEY}}
-      S3_ACCESS_KEY: ${{secrets.S3_ACCESS_KEY}}
-      S3_SECRET_ACCESS_KEY: ${{secrets.S3_SECRET_ACCESS_KEY}}
-      DB_NAME: ${{secrets.DB_NAME}}
-      DB_PW: 1234
-      DB_REMOTE_HOST: ${{secrets.DB_REMOTE_HOST}}
-      DB_REMOTE_PW: ${{secrets.DB_REMOTE_PW}}
-      DB_REMOTE_USERNAME: ${{secrets.DB_REMOTE_USERNAME}}
-      BUCKET_NAME: ${{secrets.BUCKET_NAME}}
-      CORS_ALLOWED_ORIGIN: ${{secrets.CORS_ALLOWED_ORIGIN}}
-
     steps:
-      - uses: actions/checkout@v3
+      - name: checkout repository
+        uses: actions/checkout@v3
+
       - name: 파이썬 ${{ matrix.python-version }} 설치
         uses: actions/setup-python@v3
         with:
@@ -38,7 +28,7 @@ jobs:
         uses: mirromutth/mysql-action@v1.1
         with:
           mysql version: '8.0'
-          mysql database: ${{env.DB_NAME}}
+          mysql database: ${{secrets.DB_NAME}}
           mysql root password: 1234
           character set server: 'utf8mb4'
           collation server: 'utf8mb4_general_ci'
@@ -68,8 +58,20 @@ jobs:
             cd Backend/
 
             # Git Update
-            git pull
+            git pull origin main
 
+            # .env 파일 생성
+            echo SECRET_KEY=${{ secrets.SECRET_KEY }} > .env
+            echo S3_ACCESS_KEY=${{secrets.S3_ACCESS_KEY}} >> .env
+            echo S3_SECRET_ACCESS_KEY=${{secrets.S3_SECRET_ACCESS_KEY}} >> .env
+            echo DB_NAME=${{secrets.DB_NAME}} >> .env
+            echo DB_PW=1234 >> .env
+            echo DB_REMOTE_HOST=${{secrets.DB_REMOTE_HOST}} >> .env
+            echo DB_REMOTE_PW=${{secrets.DB_REMOTE_PW}} >> .env
+            echo DB_REMOTE_USERNAME=${{secrets.DB_REMOTE_USERNAME}} >> .env
+            echo BUCKET_NAME=${{secrets.BUCKET_NAME}} >> .env
+            echo CORS_ALLOWED_ORIGIN=${{secrets.CORS_ALLOWED_ORIGIN}} >> .env
+            
             # 모듈 설치
             pip install -r requirements.txt
 
