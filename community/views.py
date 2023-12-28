@@ -94,7 +94,7 @@ class CommunityView(viewsets.ModelViewSet):
 
     def get_queryset(self):
         # 검색어에 따라 필터링
-        queryset = Community.objects.all()
+        queryset = Community.objects.all().filter(user=self.request.user)
         search_keyword = self.request.query_params.get("search", None)
         if search_keyword:
             # Q 객체를 사용하여 제목 또는 내용에서 검색
